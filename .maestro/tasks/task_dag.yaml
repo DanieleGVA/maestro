@@ -1,0 +1,265 @@
+# MAESTRO Task DAG — 6 Phases, 32 Tasks
+# Status: pending | in_progress | completed | blocked
+# All tasks start as pending
+
+phase_1_foundation:
+  - id: T1.1
+    subject: "Requirements v0.3 synthesis"
+    description: "Consolidate v0.2 + domain-specialist findings into v0.3 requirements doc"
+    owner: MSTR-01
+    contributors: [MSTR-02, MSTR-03, MSTR-15, MSTR-16, MSTR-17, MSTR-18, MSTR-19]
+    blocked_by: []
+    status: pending
+
+  - id: T1.2
+    subject: "Tech stack revalidation"
+    description: "Validate v0.2 S5 reference stack; produce ADRs for each component; flag alternatives"
+    owner: MSTR-02
+    contributors: [MSTR-10, MSTR-11, MSTR-12, MSTR-13]
+    blocked_by: []
+    status: pending
+
+  - id: T1.3
+    subject: "Pedagogical model validation"
+    description: "Validate F3, F11 state machine, retention intervals, rollup rule against learning-sciences literature; produce ADRs"
+    owner: MSTR-03
+    contributors: [MSTR-15, MSTR-22]
+    blocked_by: []
+    status: pending
+
+phase_2_architecture:
+  - id: T2.1
+    subject: "Multi-agent system HLD"
+    description: "Design the runtime multi-agent architecture of MAESTRO product"
+    owner: MSTR-04
+    contributors: []
+    blocked_by: [T1.1, T1.2, T1.3]
+    status: pending
+
+  - id: T2.2
+    subject: "Knowledge graph & curriculum architecture"
+    description: "Design KG schema, ingestion pipeline, concept-mapping engine"
+    owner: MSTR-05
+    contributors: []
+    blocked_by: [T1.1, T1.3]
+    status: pending
+
+  - id: T2.3
+    subject: "Content generation & multimodal architecture"
+    description: "Design five content channels, generation pipelines, prompt architecture"
+    owner: MSTR-06
+    contributors: []
+    blocked_by: [T1.1, T1.3, T2.1]
+    status: pending
+
+  - id: T2.4
+    subject: "Data & mastery state architecture"
+    description: "Design KMM state store, transition history, heatmap, F14 data model"
+    owner: MSTR-07
+    contributors: []
+    blocked_by: [T1.1, T1.2, T1.3]
+    status: pending
+
+  - id: T2.5
+    subject: "Cross-component interface contracts + production HLD ratification"
+    description: "Synthesise interface contracts, ratify production HLD"
+    owner: MSTR-02
+    contributors: []
+    blocked_by: [T2.1, T2.2, T2.3, T2.4]
+    status: pending
+
+phase_3_compliance_and_safety:
+  - id: T3.1
+    subject: "DPIA + consent design (F14.3 granular consents)"
+    description: "Data Protection Impact Assessment + 5 granular consent flow designs"
+    owner: MSTR-16
+    contributors: []
+    blocked_by: [T2.4]
+    status: pending
+
+  - id: T3.2
+    subject: "Safeguarding policies + content moderation flows"
+    description: "Design Safeguarding Agent, moderation pipeline, wellbeing detection, escalation"
+    owner: MSTR-19
+    contributors: []
+    blocked_by: [T2.3]
+    status: pending
+
+  - id: T3.3
+    subject: "Accessibility design system + DSA/BES protocol"
+    description: "WCAG 2.1 AA design system, accessibility audit plan, DSA/BES testing"
+    owner: MSTR-17
+    contributors: []
+    blocked_by: [T2.5]
+    status: pending
+
+  - id: T3.4
+    subject: "Bilingual ops + native reviewer SLA (MVP: 2 languages)"
+    description: "Bilingual operations spec for Ukrainian + Arabic, glossary, reviewer process"
+    owner: MSTR-18
+    contributors: []
+    blocked_by: [T2.3, T2.5]
+    status: pending
+
+  - id: T3.5
+    subject: "Security architecture (authn/authz, encryption, audit, pseudonymisation)"
+    description: "Security architecture: SSO, encryption, secrets, threat model, pseudonymisation"
+    owner: MSTR-13
+    contributors: []
+    blocked_by: [T2.5, T3.1]
+    status: pending
+
+phase_4_implementation:
+  - id: T4.1
+    subject: "Backend orchestration + agent framework"
+    description: "Build orchestrator, API layer, agent framework integration"
+    owner: MSTR-08
+    contributors: []
+    blocked_by: [T2.5, T3.5]
+    status: pending
+
+  - id: T4.2
+    subject: "KG ingestion pipeline + concept mapping"
+    description: "Build lesson ingestion, transcription, vector indexing, KG operations"
+    owner: MSTR-11
+    contributors: []
+    blocked_by: [T2.2, T2.4]
+    status: pending
+
+  - id: T4.3
+    subject: "Content generation services (text + minimal podcast)"
+    description: "Build LLM ops, prompt management, RAG pipeline, evaluation harness, pseudonymisation"
+    owner: MSTR-10
+    contributors: []
+    blocked_by: [T2.3, T3.2]
+    status: pending
+
+  - id: T4.4
+    subject: "Knowledge Map Manager + state store + audit log"
+    description: "Build six-state machine, transition tracking, heatmap, override audit"
+    owner: MSTR-08
+    contributors: []
+    blocked_by: [T2.4, T3.5]
+    status: pending
+
+  - id: T4.5
+    subject: "F14 admin path (anagrafica + consenso + iscrizione)"
+    description: "Build student lifecycle, consent management, enrolment, right to erasure"
+    owner: MSTR-08
+    contributors: []
+    blocked_by: [T2.4, T3.1, T3.5]
+    status: pending
+
+  - id: T4.6
+    subject: "Student mobile app MVP"
+    description: "Build student-facing mobile app with KG map, recovery missions, quizzes"
+    owner: MSTR-09
+    contributors: []
+    blocked_by: [T2.5, T3.3, T4.1]
+    status: pending
+
+  - id: T4.7
+    subject: "Teacher dashboard"
+    description: "Build teacher-facing web dashboard with heatmap, overrides, lesson upload"
+    owner: MSTR-09
+    contributors: [MSTR-08]
+    blocked_by: [T2.5, T3.3, T4.1, T4.4]
+    status: pending
+
+  - id: T4.8
+    subject: "Bilingual MVP (2 languages)"
+    description: "Implement bilingual content generation for Ukrainian and Arabic"
+    owner: MSTR-18
+    contributors: []
+    blocked_by: [T3.4, T4.3, T4.6]
+    status: pending
+
+phase_5_testing_and_verification:
+  - id: T5.1
+    subject: "Unit + integration test suite"
+    description: "Build unit tests (>=80% coverage) and integration tests (>=60% critical paths)"
+    owner: MSTR-14
+    contributors: []
+    blocked_by: [T4.1, T4.2, T4.3, T4.4, T4.5]
+    status: pending
+
+  - id: T5.2
+    subject: "E2E acceptance tests (student + teacher journeys)"
+    description: "Build end-to-end tests for all MVP user journeys"
+    owner: MSTR-14
+    contributors: []
+    blocked_by: [T4.6, T4.7]
+    status: pending
+
+  - id: T5.3
+    subject: "Accessibility audit (WCAG 2.1 AA + DSA/BES)"
+    description: "Automated + manual accessibility testing, screen reader verification"
+    owner: MSTR-17
+    contributors: [MSTR-14]
+    blocked_by: [T4.6, T4.7]
+    status: pending
+
+  - id: T5.4
+    subject: "Security pen-test"
+    description: "Automated + manual security testing, remediation"
+    owner: MSTR-13
+    contributors: []
+    blocked_by: [T4.5, T4.7]
+    status: pending
+
+  - id: T5.5
+    subject: "Pedagogical efficacy test design + first run"
+    description: "Test generated content against pedagogical quality bar, first efficacy measurement"
+    owner: MSTR-22
+    contributors: [MSTR-14, MSTR-15]
+    blocked_by: [T4.3, T4.4, T4.8]
+    status: pending
+
+  - id: T5.6
+    subject: "Bias & safety audit (content + safeguarding)"
+    description: "Gender, geographic, socio-economic, cultural bias testing + safeguarding validation"
+    owner: MSTR-19
+    contributors: [MSTR-14]
+    blocked_by: [T4.3, T4.8]
+    status: pending
+
+phase_6_deployment:
+  - id: T6.1
+    subject: "CI/CD + monitoring + alerting"
+    description: "Build deployment pipeline, monitoring dashboards, alerting"
+    owner: MSTR-12
+    contributors: []
+    blocked_by: [T5.1]
+    status: pending
+
+  - id: T6.2
+    subject: "DR plan + EU residency infrastructure"
+    description: "Disaster recovery plan, EU-only infrastructure, backup verification"
+    owner: MSTR-12
+    contributors: []
+    blocked_by: [T6.1]
+    status: pending
+
+  - id: T6.3
+    subject: "DPIA filing + Garante Privacy alignment"
+    description: "File DPIA with regulator, document Garante Privacy compliance"
+    owner: MSTR-16
+    contributors: []
+    blocked_by: [T5.1, T5.4, T5.6]
+    status: pending
+
+  - id: T6.4
+    subject: "Audit trail end-to-end validation"
+    description: "Verify complete audit trail reconstruction for sample student"
+    owner: MSTR-16
+    contributors: []
+    blocked_by: [T6.3]
+    status: pending
+
+  - id: T6.5
+    subject: "Pilot deployment plan (1 school, 1 class)"
+    description: "Plan for pilot deployment at I.T.E.T. Pantanelli-Monnet (or alternative)"
+    owner: MSTR-01
+    contributors: []
+    blocked_by: [T6.2, T6.4, T5.2, T5.3, T5.5]
+    status: pending
