@@ -1,0 +1,131 @@
+/* ──────────────────────────────────────────────────────────────
+   MAESTRO — Student app design tokens
+   Aesthetic: editorial / cyber, warm ink, signal lime
+   ────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* surfaces — warm ink + bone */
+  --ink:       #14110D;
+  --ink-2:     #1C1813;
+  --ink-3:     #2A241C;
+  --ink-line:  #3A3327;
+
+  --bone:      #F5EFE3;
+  --bone-2:    #ECE4D2;
+  --bone-3:    #D9CFB8;
+  --bone-line: #C8BDA1;
+
+  --paper:     #FBF7EE;
+  --char:      #14110D;
+
+  /* signal — brand pop */
+  --signal:    #D4FF3D;   /* electric lime */
+  --signal-2:  #E8FF7A;
+  --signal-ink:#0B1300;
+
+  /* state — semaphore (always paired with icon + text) */
+  --red:       #E74C3C;   /* lacuna — "open door" */
+  --red-soft:  #3A1F1A;
+  --orange:    #FF8A3D;   /* in recovery */
+  --orange-soft:#3A2519;
+  --yellow:    #F5C53D;   /* to consolidate */
+  --yellow-soft:#3A2F12;
+  --green:     #4ADE80;   /* consolidated */
+  --green-soft:#173220;
+  --gray:      #8A8275;   /* not introduced */
+  --white-st:  #E7E0CE;   /* introduced */
+
+  /* type */
+  --display: 'Instrument Serif', 'Times New Roman', serif;
+  --sans:    'Geist', -apple-system, system-ui, sans-serif;
+  --mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  /* radii */
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+}
+
+/* base reset for screens */
+.maestro-screen *,
+.maestro-screen *::before,
+.maestro-screen *::after { box-sizing: border-box; }
+
+.maestro-screen {
+  font-family: var(--sans);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--bone);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.maestro-screen.light { color: var(--char); }
+
+/* primitives */
+.m-display { font-family: var(--display); font-weight: 400; letter-spacing: -0.02em; line-height: 0.95; }
+.m-display-i { font-family: var(--display); font-weight: 400; font-style: italic; letter-spacing: -0.02em; line-height: 0.95; }
+.m-mono { font-family: var(--mono); letter-spacing: 0; }
+.m-eyebrow {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em;
+  text-transform: uppercase; opacity: 0.55;
+}
+
+/* state pills */
+.m-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 9px; border-radius: 100px;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.01em;
+  font-family: var(--sans);
+  border: 1px solid currentColor;
+}
+.m-pill svg { width: 10px; height: 10px; flex: none; }
+
+.m-pill-red    { color: var(--red);    background: var(--red-soft); border-color: rgba(231,76,60,0.4); }
+.m-pill-orange { color: var(--orange); background: var(--orange-soft); border-color: rgba(255,138,61,0.4); }
+.m-pill-yellow { color: var(--yellow); background: var(--yellow-soft); border-color: rgba(245,197,61,0.4); }
+.m-pill-green  { color: var(--green);  background: var(--green-soft); border-color: rgba(74,222,128,0.4); }
+.m-pill-gray   { color: var(--gray);   background: rgba(138,130,117,0.12); border-color: rgba(138,130,117,0.4); }
+.m-pill-signal { color: var(--signal-ink); background: var(--signal); border-color: var(--signal); }
+
+/* buttons */
+.m-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 16px 22px; border-radius: 100px; border: 0;
+  font-family: var(--sans); font-size: 15px; font-weight: 600;
+  letter-spacing: -0.01em; cursor: pointer; text-decoration: none;
+  transition: transform 0.15s ease;
+}
+.m-btn-primary { background: var(--signal); color: var(--signal-ink); }
+.m-btn-ghost   { background: transparent; color: var(--bone); border: 1px solid var(--ink-line); }
+.m-btn-solid-dark { background: var(--ink-2); color: var(--bone); border: 1px solid var(--ink-line); }
+
+/* scroll hider */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+/* tab bar */
+.m-tabbar {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 10px 18px 28px; display: flex; justify-content: space-around;
+  background: linear-gradient(to top, var(--ink) 60%, rgba(20,17,13,0));
+  z-index: 5;
+}
+.m-tab {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 6px 14px; border-radius: 14px;
+  color: rgba(245,239,227,0.5); font-size: 10px; font-weight: 500;
+  font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.m-tab.active { color: var(--signal); }
+.m-tab svg { width: 22px; height: 22px; }
+
+/* status dot used in maps */
+.m-dot {
+  width: 10px; height: 10px; border-radius: 100px; flex: none;
+  display: inline-block;
+}

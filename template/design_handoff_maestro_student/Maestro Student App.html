@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=1600" />
+  <title>Maestro — Student app</title>
+  <link rel="stylesheet" href="maestro-tokens.css" />
+  <style>
+    html, body { margin: 0; height: 100%; background: #0B0907; font-family: 'Geist', system-ui, sans-serif; }
+    body { overflow: hidden; }
+  </style>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="ios-frame.jsx"></script>
+  <script type="text/babel" src="screens-1.jsx"></script>
+  <script type="text/babel" src="screens-2.jsx"></script>
+  <script type="text/babel" src="screens-3.jsx"></script>
+  <script type="text/babel" src="screens-tablet.jsx"></script>
+  <script type="text/babel" src="screens-desktop.jsx"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="react">
+    (function() {
+    const DesignCanvas = window.DesignCanvas, DCSection = window.DCSection, DCArtboard = window.DCArtboard;
+    const IOSDevice = window.IOSDevice;
+    const { ScreenLogin, ScreenOnbWelcome, ScreenOnbQuiz, ScreenOnbResult,
+      ScreenHome, ScreenMap, ScreenNodeDetail, ScreenMission,
+      ScreenQuizQuestion, ScreenQuizResult, ScreenDocument, ScreenProfile, ScreenExplain,
+      TLogin, TOnbWelcome, TOnbQuiz, TOnbResult, THome, TMap, TNodeDetail, TMission,
+      TQuizQ, TQuizR, TDocument, TProfile, TExplain,
+      DLogin, DOnbWelcome, DOnbQuiz, DOnbResult, DHome, DMap, DNodeDetail, DMissionPage,
+      DQuizQ, DQuizR, DDocument, DProfile, DExplain } = window;
+
+    // Tablet/Desktop bare frames — just a 1px border to indicate the canvas, no device chrome.
+    function PlainFrame({ width, height, light, children }) {
+      return (
+        <div style={{
+          width, height, background: light ? 'var(--paper)' : 'var(--ink)',
+          borderRadius: 24, overflow: 'hidden',
+          boxShadow: '0 30px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05)',
+        }}>{children}</div>
+      );
+    }
+
+    const W = 402, H = 874;
+
+    function App() {
+      // DCArtboard MUST be a direct child of DCSection.
+      const board = (id, label, light, Screen) => (
+        <DCArtboard id={id} label={label} width={W} height={H}>
+          <IOSDevice width={W} height={H} dark={!light}>
+            <Screen />
+          </IOSDevice>
+        </DCArtboard>
+      );
+      const tW = 820, tH = 1180;
+      const tboard = (id, label, light, Screen) => (
+        <DCArtboard id={id} label={label} width={tW} height={tH}>
+          <PlainFrame width={tW} height={tH} light={light}><Screen /></PlainFrame>
+        </DCArtboard>
+      );
+      const dW = 1280, dH = 820;
+      const dboard = (id, label, light, Screen) => (
+        <DCArtboard id={id} label={label} width={dW} height={dH}>
+          <PlainFrame width={dW} height={dH} light={light}><Screen /></PlainFrame>
+        </DCArtboard>
+      );
+
+      return (
+        <DesignCanvas
+          title="Maestro · Student App"
+          subtitle="High-fidelity screens — 12 flows, mobile first"
+          background="#0B0907"
+          textColor="#F5EFE3"
+          padding={64}
+          initialZoom={0.7}
+        >
+          <DCSection
+            id="onboarding"
+            title="01 · Sign in & set up"
+            subtitle="From first launch to a tuned learning profile."
+          >
+            {board('login',       'SCR-ST-01 · Login',          false, ScreenLogin)}
+            {board('onb-welcome', 'SCR-ST-02a · Welcome',       true,  ScreenOnbWelcome)}
+            {board('onb-quiz',    'SCR-ST-02b · Modality quiz', false, ScreenOnbQuiz)}
+            {board('onb-result',  'SCR-ST-02c · Your shape',    false, ScreenOnbResult)}
+          </DCSection>
+
+          <DCSection
+            id="navigate"
+            title="02 · Daily nav"
+            subtitle="Home, the knowledge map and any single concept."
+          >
+            {board('home', 'SCR-ST-03 · Home',           false, ScreenHome)}
+            {board('map',  'SCR-ST-04 · Knowledge map',  false, ScreenMap)}
+            {board('node', 'SCR-ST-05 · Node detail',    false, ScreenNodeDetail)}
+          </DCSection>
+
+          <DCSection
+            id="learn"
+            title="03 · Close the gap"
+            subtitle="A short mission, a quiz, a personalised document."
+          >
+            {board('mission', 'SCR-ST-06 · Mission',          false, ScreenMission)}
+            {board('quiz-q',  'SCR-ST-07a · Quiz question',   true,  ScreenQuizQuestion)}
+            {board('quiz-r',  'SCR-ST-07b · Quiz result',     false, ScreenQuizResult)}
+            {board('doc',     'SCR-ST-08 · Review document',  true,  ScreenDocument)}
+          </DCSection>
+
+          <DCSection
+            id="settings"
+            title="04 · You, in control"
+            subtitle="Profile, preferences and Maestro's explainability."
+          >
+            {board('profile', 'SCR-ST-09 · Profile',     false, ScreenProfile)}
+            {board('why',     'SCR-ST-10 · Why this?',   false, ScreenExplain)}
+          </DCSection>
+
+          {/* ── TABLET ────────────────────────────────────── */}
+          <DCSection
+            id="tablet-onb"
+            title="📱 TABLET · 01 — Sign in & set up"
+            subtitle="iPad portrait (820×1180) — wider canvas, two-column quiz, expanded radar."
+          >
+            {tboard('t-login',   'TAB · Login',                false, TLogin)}
+            {tboard('t-onb-w',   'TAB · Onboarding welcome',   true,  TOnbWelcome)}
+            {tboard('t-onb-q',   'TAB · Modality quiz',        false, TOnbQuiz)}
+            {tboard('t-onb-r',   'TAB · Your shape',           false, TOnbResult)}
+          </DCSection>
+
+          <DCSection id="tablet-nav" title="📱 TABLET · 02 — Daily nav" subtitle="Persistent side tab bar, denser dashboard.">
+            {tboard('t-home', 'TAB · Home',           false, THome)}
+            {tboard('t-map',  'TAB · Knowledge map',  false, TMap)}
+            {tboard('t-node', 'TAB · Node detail',    false, TNodeDetail)}
+          </DCSection>
+
+          <DCSection id="tablet-learn" title="📱 TABLET · 03 — Close the gap" subtitle="Mission + quiz + reader at tablet density.">
+            {tboard('t-mission', 'TAB · Mission',         false, TMission)}
+            {tboard('t-quiz-q',  'TAB · Quiz question',   true,  TQuizQ)}
+            {tboard('t-quiz-r',  'TAB · Quiz result',     false, TQuizR)}
+            {tboard('t-doc',     'TAB · Review document', true,  TDocument)}
+          </DCSection>
+
+          <DCSection id="tablet-set" title="📱 TABLET · 04 — You, in control" subtitle="Two-column settings.">
+            {tboard('t-profile', 'TAB · Profile',   false, TProfile)}
+            {tboard('t-why',     'TAB · Why this?', false, TExplain)}
+          </DCSection>
+
+          {/* ── DESKTOP ───────────────────────────────────── */}
+          <DCSection
+            id="desktop-onb"
+            title="🖥 DESKTOP · 01 — Sign in & set up"
+            subtitle="1280×820 — split-screen login, full-bleed onboarding, large radar."
+          >
+            {dboard('d-login',   'DSK · Login',              false, DLogin)}
+            {dboard('d-onb-w',   'DSK · Onboarding welcome', true,  DOnbWelcome)}
+            {dboard('d-onb-q',   'DSK · Modality quiz',      false, DOnbQuiz)}
+            {dboard('d-onb-r',   'DSK · Your shape',         false, DOnbResult)}
+          </DCSection>
+
+          <DCSection id="desktop-nav" title="🖥 DESKTOP · 02 — Daily nav" subtitle="Persistent sidebar + topbar + multi-column workspace.">
+            {dboard('d-home', 'DSK · Home',           false, DHome)}
+            {dboard('d-map',  'DSK · Knowledge map',  false, DMap)}
+            {dboard('d-node', 'DSK · Node detail',    false, DNodeDetail)}
+          </DCSection>
+
+          <DCSection id="desktop-learn" title="🖥 DESKTOP · 03 — Close the gap" subtitle="Mission stage + video preview, focus-mode quiz, three-pane reader.">
+            {dboard('d-mission', 'DSK · Mission',         false, DMissionPage)}
+            {dboard('d-quiz-q',  'DSK · Quiz question',   true,  DQuizQ)}
+            {dboard('d-quiz-r',  'DSK · Quiz result',     false, DQuizR)}
+            {dboard('d-doc',     'DSK · Review document', true,  DDocument)}
+          </DCSection>
+
+          <DCSection id="desktop-set" title="🖥 DESKTOP · 04 — You, in control" subtitle="Profile workspace and centred why-this modal.">
+            {dboard('d-profile', 'DSK · Profile',   false, DProfile)}
+            {dboard('d-why',     'DSK · Why this?', false, DExplain)}
+          </DCSection>
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    })();
+  </script>
+</body>
+</html>
