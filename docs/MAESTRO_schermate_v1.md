@@ -1,7 +1,7 @@
 # Specifiche Schermate — MAESTRO v1.0
 
 **Versione:** v1.0
-**Allineato a:** MAESTRO_use_cases_v1.md, MAESTRO_documento_progetto_v0.2.md
+**Allineato a:** MAESTRO_use_cases_v1.md, MAESTRO_requisiti_v0.3.md
 **Convenzione ID:** `SCR-<area>-<NN>` — Aree: ST (Studente), DOC (Docente), FAM (Famiglia), AS (Admin), COR (Coordinatore)
 **Colori semaforo di riferimento:** grigio (#9E9E9E), bianco (#FFFFFF), rosso (#E53935), arancione (#FB8C00), giallo (#FDD835), verde (#43A047)
 
@@ -393,6 +393,7 @@ Pannello completo per consultare e modificare il profilo di apprendimento e le p
 - **Dimensione testo** — slider — 12pt ← → 24pt — con anteprima live
 - **Tema** — segmented control — Chiaro / Scuro / Seppia
 - **Alto contrasto** — toggle on/off
+- **Animazioni ridotte** — toggle on/off (F9.7)
 - **Anteprima** — box che mostra testo campione con le impostazioni correnti
 
 **Sezione "Bilinguismo" (se consenso b attivo)**
@@ -488,7 +489,7 @@ Schermata di accesso per il docente. Supporta credenziali locali e SSO scolastic
 
 ### SCR-DOC-02 — Home dashboard docente
 
-**Use case**: UC-DOC-01 | **Requisiti**: F4.4, F7.3, F10 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: — (navigazione centrale) | **Requisiti**: F12.7, F11.14, F12.1, F16.1 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Schermata principale del docente. Offre una vista d'insieme dello stato delle classi assegnate con indicatori rapidi sulle lacune.
@@ -532,7 +533,7 @@ Schermata principale del docente. Offre una vista d'insieme dello stato delle cl
 
 ### SCR-DOC-03 — Setup corso
 
-**Use case**: UC-DOC-02 | **Requisiti**: F4.1, F4.3 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-DOC-17, UC-DOC-09, UC-DOC-12 | **Requisiti**: F17.1, F17.2, F17.3, F1.6, F13.1 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Wizard guidato per la configurazione iniziale di un corso. Viene proposto al primo accesso o alla creazione di un nuovo corso.
@@ -542,6 +543,8 @@ Wizard guidato per la configurazione iniziale di un corso. Viene proposto al pri
 - **Classe** — text field — es. "3AI" — obbligatorio
 - **Anno scolastico** — dropdown — es. "2025-2026" — obbligatorio
 - **Materia** — dropdown — lista materie supportate — obbligatorio
+- **Livello scolastico** — dropdown — opzioni: "Secondaria di primo grado", "Biennio secondaria di secondo grado", "Triennio secondaria di secondo grado", "Post-diploma/ITS", "Formazione professionale" — obbligatorio (F1.6)
+- **Lingua ufficiale** — dropdown — default: Italiano — obbligatorio (F13.1)
 - **Bottone "Avanti"** — primary button
 
 **Wizard — Step 2: Knowledge graph iniziale**
@@ -568,7 +571,7 @@ Wizard guidato per la configurazione iniziale di un corso. Viene proposto al pri
 
 ### SCR-DOC-04 — Upload lezione
 
-**Use case**: UC-DOC-03 | **Requisiti**: F4.1, F4.2 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-DOC-01 | **Requisiti**: F2.1, F2.7, F2.8 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Schermata per il caricamento di materiale didattico (appunti, slide, registrazioni). Avvia il pipeline di ingestion e concept mapping.
@@ -606,7 +609,7 @@ Schermata per il caricamento di materiale didattico (appunti, slide, registrazio
 
 ### SCR-DOC-05 — Editor trascrizione
 
-**Use case**: UC-DOC-03 (sotto-flusso) | **Requisiti**: F4.2 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-DOC-02 | **Requisiti**: F2.2, F2.3 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Editor per la revisione della trascrizione automatica di una lezione audio/video.
@@ -632,7 +635,7 @@ Editor per la revisione della trascrizione automatica di una lezione audio/video
 
 ### SCR-DOC-06 — Validazione mapping concetti
 
-**Use case**: UC-DOC-03 (sotto-flusso) | **Requisiti**: F4.2, F4.3 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-DOC-03 | **Requisiti**: F2.4 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Il docente rivede e valida il mapping automatico tra i concetti estratti dalla lezione e i nodi del Knowledge Graph.
@@ -664,7 +667,7 @@ Il docente rivede e valida il mapping automatico tra i concetti estratti dalla l
 
 ### SCR-DOC-07 — Upload verifica
 
-**Use case**: UC-DOC-04 | **Requisiti**: F7.1, F7.2 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-DOC-04 | **Requisiti**: F4.1, F4.2, F4.4, F4.6 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Caricamento di una verifica con associazione domande-concetti e inserimento voti per studente.
@@ -704,7 +707,7 @@ Caricamento di una verifica con associazione domande-concetti e inserimento voti
 
 ### SCR-DOC-08 — Vista classe / Heatmap
 
-**Use case**: UC-DOC-05 | **Requisiti**: F7.3, F10 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-DOC-06 | **Requisiti**: F11.14, F12.1 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Vista aggregata della classe con heatmap delle lacune. Il docente visualizza lo stato di padronanza di ogni studente su ogni macro-argomento.
@@ -748,7 +751,7 @@ Vista aggregata della classe con heatmap delle lacune. Il docente visualizza lo 
 
 ### SCR-DOC-09 — Mappa studente singolo (vista docente)
 
-**Use case**: UC-DOC-05 (sotto-flusso) | **Requisiti**: F7.3, F10 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-DOC-14 | **Requisiti**: F12.2, F11.5 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Il docente visualizza la mappa della conoscenza di un singolo studente. Simile a SCR-ST-04 ma con controlli aggiuntivi (override, cronologia completa).
@@ -782,7 +785,7 @@ Il docente visualizza la mappa della conoscenza di un singolo studente. Simile a
 
 ### SCR-DOC-10 — Override stato nodo
 
-**Use case**: UC-DOC-06 | **Requisiti**: F7.4, F7.5 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-DOC-16 | **Requisiti**: F11.12 | **Priorità**: V1 | **Piattaforma**: Web
 
 **Descrizione**
 Dialog per il docente per forzare la transizione di stato di un nodo del KG di uno studente.
@@ -806,7 +809,7 @@ Dialog per il docente per forzare la transizione di stato di un nodo del KG di u
 
 ### SCR-DOC-11 — Editor Knowledge Graph
 
-**Use case**: UC-DOC-07 | **Requisiti**: F4.3 | **Priorità**: V1 | **Piattaforma**: Web
+**Use case**: UC-DOC-10 | **Requisiti**: F1.2, F1.4 | **Priorità**: V1 | **Piattaforma**: Web
 
 **Descrizione**
 Editor visuale per modificare la struttura del Knowledge Graph del corso.
@@ -846,7 +849,7 @@ Editor visuale per modificare la struttura del Knowledge Graph del corso.
 
 ### SCR-DOC-12 — Iscrizione studenti
 
-**Use case**: UC-DOC-08 | **Requisiti**: F14 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-DOC-12 | **Requisiti**: F14.5 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Gestione dell'elenco studenti di una classe. Aggiunta, rimozione, invio richieste consenso.
@@ -878,7 +881,7 @@ Gestione dell'elenco studenti di una classe. Aggiunta, rimozione, invio richiest
 
 ### SCR-DOC-13 — Gestione contenuti generati
 
-**Use case**: UC-DOC-09 | **Requisiti**: F5, F6, F13 | **Priorità**: V1 | **Piattaforma**: Web
+**Use case**: UC-DOC-08 | **Requisiti**: F15.1–F15.4, F12.5 | **Priorità**: V1 | **Piattaforma**: Web
 
 **Descrizione**
 Il docente visualizza e gestisce i contenuti generati dal sistema (documenti di ripasso, missioni, quiz) per la propria classe.
@@ -902,7 +905,7 @@ Il docente visualizza e gestisce i contenuti generati dal sistema (documenti di 
 
 ### SCR-DOC-14 — Pannello override in massa
 
-**Use case**: UC-DOC-06 (variante) | **Requisiti**: F7.4 | **Priorità**: V1 | **Piattaforma**: Web
+**Use case**: UC-DOC-16 (variante) | **Requisiti**: F11.12 | **Priorità**: V1 | **Piattaforma**: Web
 
 **Descrizione**
 Override di stato su più studenti contemporaneamente (es. dopo una verifica orale di recupero per un gruppo).
@@ -922,7 +925,7 @@ Override di stato su più studenti contemporaneamente (es. dopo una verifica ora
 
 ### SCR-DOC-15 — Report lacune e copertura
 
-**Use case**: UC-DOC-10 | **Requisiti**: F10 | **Priorità**: V1 | **Piattaforma**: Web
+**Use case**: UC-DOC-11 | **Requisiti**: F2.12, F12.1 | **Priorità**: V1 | **Piattaforma**: Web
 
 **Descrizione**
 Report analitico sulle lacune della classe e sulla copertura del programma.
@@ -952,7 +955,7 @@ Report analitico sulle lacune della classe e sulla copertura del programma.
 
 ### SCR-DOC-16 — Alert e notifiche docente
 
-**Use case**: UC-DOC-11 | **Requisiti**: F10 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-DOC-19 | **Requisiti**: F16.1, F16.2 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Centro notifiche del docente con alert sullo stato della classe.
@@ -982,7 +985,7 @@ Centro notifiche del docente con alert sullo stato della classe.
 
 ### SCR-FAM-01 — Registrazione consenso
 
-**Use case**: UC-FAM-01 | **Requisiti**: F14.3, N1 | **Priorità**: MVP | **Piattaforma**: Web (link da email)
+**Use case**: UC-FAM-00 | **Requisiti**: F14.3, N1 | **Priorità**: MVP | **Piattaforma**: Web (link da email)
 
 **Descrizione**
 La famiglia riceve un link via email e registra i 5 consensi granulari per il proprio figlio. Non richiede creazione account.
@@ -1047,7 +1050,7 @@ La famiglia riceve un link via email e registra i 5 consensi granulari per il pr
 
 ### SCR-FAM-02 — Report mensile famiglia
 
-**Use case**: UC-FAM-02 | **Requisiti**: F14.3(c) | **Priorità**: MVP | **Piattaforma**: Web (link da email) + PDF allegato
+**Use case**: UC-FAM-02 | **Requisiti**: F11.16, F14.3(c) | **Priorità**: V1 | **Piattaforma**: Web (link da email) + PDF allegato
 
 **Descrizione**
 Report mensile sui progressi dello studente, visibile via web e scaricabile come PDF. Accessibile solo se consenso (c) concesso.
@@ -1112,7 +1115,7 @@ La famiglia richiede la cancellazione dei dati del proprio figlio. Flusso con do
 
 ### SCR-FAM-04 — Aggiornamento consenso
 
-**Use case**: UC-FAM-04 | **Requisiti**: F14.3 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-FAM-04 | **Requisiti**: F14.3 | **Priorità**: V2 | **Piattaforma**: Web
 
 **Descrizione**
 La famiglia modifica i consensi precedentemente concessi. Accessibile in qualsiasi momento.
@@ -1160,7 +1163,7 @@ Schermata di accesso dedicata all'amministratore IT della scuola.
 
 ### SCR-AS-02 — Dashboard gestione utenze
 
-**Use case**: UC-AS-01 | **Requisiti**: F14 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-AS-02 | **Requisiti**: F14, N2 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Dashboard principale dell'admin IT per la gestione di tutti gli utenti del sistema (docenti, studenti, famiglie).
@@ -1195,7 +1198,7 @@ Dashboard principale dell'admin IT per la gestione di tutti gli utenti del siste
 
 ### SCR-AS-03 — Creazione studente (admin)
 
-**Use case**: UC-AS-02 | **Requisiti**: F14 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-AS-05 | **Requisiti**: F14.2 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Form per la creazione di un singolo studente da parte dell'admin (alternativa all'iscrizione da parte del docente).
@@ -1260,7 +1263,7 @@ Registro completo e immutabile di tutti gli eventi di sistema rilevanti per comp
 
 ### SCR-AS-05 — Cancellazione studente (right to erasure)
 
-**Use case**: UC-AS-04 | **Requisiti**: F14.9, N1 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-AS-08 | **Requisiti**: F14.9, N1 | **Priorità**: MVP | **Piattaforma**: Web
 
 **Descrizione**
 Esecuzione della cancellazione dati di uno studente. Solo l'admin può eseguire materialmente la cancellazione (il docente e la famiglia possono solo richiederla).
@@ -1292,7 +1295,7 @@ Esecuzione della cancellazione dati di uno studente. Solo l'admin può eseguire 
 
 ### SCR-AS-06 — Configurazione SSO
 
-**Use case**: UC-AS-05 | **Requisiti**: F14.6 | **Priorità**: V1 | **Piattaforma**: Web
+**Use case**: UC-AS-01 | **Requisiti**: F14.6, N2 | **Priorità**: V1 | **Piattaforma**: Web
 
 **Descrizione**
 Configurazione dell'integrazione SSO con l'identity provider della scuola.
@@ -1323,7 +1326,7 @@ Configurazione dell'integrazione SSO con l'identity provider della scuola.
 
 ### SCR-AS-07 — Import massivo utenze
 
-**Use case**: UC-AS-06 | **Requisiti**: F14 | **Priorità**: MVP | **Piattaforma**: Web
+**Use case**: UC-AS-04 | **Requisiti**: F14.2 | **Priorità**: V1 | **Piattaforma**: Web
 
 **Descrizione**
 Import di docenti e studenti in blocco via file CSV.
@@ -1356,7 +1359,7 @@ Import di docenti e studenti in blocco via file CSV.
 
 ### SCR-COR-01 — Dashboard coordinatore
 
-**Use case**: UC-COR-01 | **Requisiti**: F10 | **Priorità**: V1 | **Piattaforma**: Web
+**Use case**: UC-COR-01 | **Requisiti**: F12.1, F11.14 | **Priorità**: V1 | **Piattaforma**: Web
 
 **Descrizione**
 Vista aggregata per il coordinatore scolastico su più classi e docenti. Permette di identificare trend e problematiche trasversali.
@@ -1455,7 +1458,7 @@ Vista aggregata per il coordinatore scolastico su più classi e docenti. Permett
 | | SCR-DOC-07 | Upload verifica | MVP |
 | | SCR-DOC-08 | Vista classe / Heatmap | MVP |
 | | SCR-DOC-09 | Mappa studente singolo | MVP |
-| | SCR-DOC-10 | Override stato nodo | MVP |
+| | SCR-DOC-10 | Override stato nodo | V1 |
 | | SCR-DOC-11 | Editor Knowledge Graph | V1 |
 | | SCR-DOC-12 | Iscrizione studenti | MVP |
 | | SCR-DOC-13 | Gestione contenuti generati | V1 |
@@ -1463,16 +1466,16 @@ Vista aggregata per il coordinatore scolastico su più classi e docenti. Permett
 | | SCR-DOC-15 | Report lacune e copertura | V1 |
 | | SCR-DOC-16 | Alert e notifiche docente | MVP |
 | **Famiglia** | SCR-FAM-01 | Registrazione consenso | MVP |
-| | SCR-FAM-02 | Report mensile famiglia | MVP |
+| | SCR-FAM-02 | Report mensile famiglia | V1 |
 | | SCR-FAM-03 | Richiesta oblio (famiglia) | MVP |
-| | SCR-FAM-04 | Aggiornamento consenso | MVP |
+| | SCR-FAM-04 | Aggiornamento consenso | V2 |
 | **Admin IT** | SCR-AS-01 | Login admin IT | MVP |
 | | SCR-AS-02 | Dashboard gestione utenze | MVP |
 | | SCR-AS-03 | Creazione studente (admin) | MVP |
 | | SCR-AS-04 | Audit log | MVP |
 | | SCR-AS-05 | Cancellazione studente | MVP |
 | | SCR-AS-06 | Configurazione SSO | V1 |
-| | SCR-AS-07 | Import massivo utenze | MVP |
+| | SCR-AS-07 | Import massivo utenze | V1 |
 | **Coordinatore** | SCR-COR-01 | Dashboard coordinatore | V1 |
 
-**Totale**: 42 schermate — 30 MVP, 12 V1
+**Totale**: 42 schermate — 29 MVP, 12 V1, 1 V2

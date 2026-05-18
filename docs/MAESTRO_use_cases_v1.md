@@ -69,12 +69,12 @@
 | UC-FAM-00 | Registrare consenso trattamento dati (granulare) | Famiglia | 🌊 | MVP | F14.3, N1 |
 | UC-FAM-02 | Consultare report mensile progressi | Famiglia | 🌊 | V1 | F11.16 |
 | UC-FAM-03 | Esercitare diritto all'oblio per il minore | Famiglia | 🌊 | MVP | F14.9, N1 |
-| UC-FAM-04 | Aggiornare il consenso | Famiglia | 🌊 | V1 | F14.3, F13.5 |
+| UC-FAM-04 | Aggiornare il consenso | Famiglia | 🌊 | V2 | F14.3, F13.5 |
 | UC-COR-01 | Consultare dati aggregati di corso/classe | Coordinatore | ☁️ | V1 | F12.1, F11.14 |
 | UC-AS-01 | Configurare SSO con registro elettronico | IT scuola | 🌊 | V1 | N2 |
 | UC-AS-02 | Gestire utenze e ruoli | IT scuola | 🌊 | MVP | N2 |
 | UC-AS-03 | Consultare audit log accessi a dati di minori | IT scuola | 🌊 | MVP | N1, N2, F14.10 |
-| UC-AS-04 | Importare massivamente studenti | IT scuola | 🌊 | V2 | F14.2 |
+| UC-AS-04 | Importare massivamente studenti | IT scuola | 🌊 | V1 | F14.2 |
 | UC-AS-05 | Creare manualmente un singolo studente | IT scuola | 🌊 | MVP | F14.2 |
 | UC-AS-06 | Aggiornare anagrafica studente | IT scuola | 🌊 | V1 | F14.7 |
 | UC-AS-07 | Sospendere/disattivare uno studente | IT scuola | 🌊 | V1 | F14.8 |
@@ -1094,7 +1094,7 @@ MVP: il genitore/tutore compila il modulo di consenso cartaceo e lo consegna all
 **Requisiti speciali**
 - Linguaggio chiaro, non legalese, adatto a genitori senza competenze legali
 - Base giuridica esplicitata per ogni consenso
-- Ogni consenso è singolarmente revocabile in qualsiasi momento (UC-FAM-04 — V1)
+- Ogni consenso è singolarmente revocabile in qualsiasi momento (UC-FAM-04 — V2)
 
 **Criteri di accettazione**
 - Il 100% dei consensi registrati ha tutte e 5 le categorie esplicitamente valorizzate (concesso/negato)
@@ -1144,7 +1144,7 @@ Il genitore/tutore richiede la cancellazione dei dati del minore (in MVP: comuni
 ### UC-FAM-02 — Consultare report mensile sui progressi (V1)
 La famiglia accede al portale e consulta il report mensile (F11.16): 1 pagina, linguaggio non tecnico, tono incoraggiante. Contenuto: macro-aree consolidate nel mese, lacune chiuse, lacune aperte (riassunto narrativo). Nessun confronto con altri studenti. Nessun valore numerico assoluto fuori contesto.
 
-### UC-FAM-04 — Aggiornare il consenso (V1)
+### UC-FAM-04 — Aggiornare il consenso (V2)
 La famiglia accede al portale, visualizza lo stato dei 5 consensi e modifica singolarmente (toggle concesso/revocato). La revoca del consenso (b) disattiva il bilinguismo. La revoca del consenso (a) resetta il profilo learning style a neutro. Ogni modifica registrata in audit log.
 
 ---
@@ -1304,7 +1304,7 @@ L'IT prende in carico una richiesta di oblio.
 ### UC-AS-01 — Configurare SSO con registro elettronico (V1)
 L'IT configura l'integrazione SSO con il registro elettronico scolastico (SAML, OAuth2, Active Directory). Il sistema verifica la connessione e mappa i ruoli del registro ai ruoli MAESTRO.
 
-### UC-AS-04 — Importare massivamente studenti dal registro elettronico (V2)
+### UC-AS-04 — Importare massivamente studenti dal registro elettronico (V1)
 L'IT avvia l'importazione massiva (F14.2): upload CSV o sincronizzazione API con il registro. Il sistema valida i dati, crea le anagrafiche, genera credenziali. I consensi devono comunque essere acquisiti individualmente.
 
 ### UC-AS-06 — Aggiornare anagrafica studente (passaggio di classe) (V1)
