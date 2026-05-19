@@ -9,7 +9,8 @@ phase_1_foundation:
     owner: MSTR-01
     contributors: [MSTR-02, MSTR-03, MSTR-15, MSTR-16, MSTR-17, MSTR-18, MSTR-19]
     blocked_by: []
-    status: pending
+    status: completed
+    evidence: "docs/MAESTRO_requisiti_v0.3.md"
 
   - id: T1.2
     subject: "Tech stack revalidation"
@@ -17,7 +18,8 @@ phase_1_foundation:
     owner: MSTR-02
     contributors: [MSTR-10, MSTR-11, MSTR-12, MSTR-13]
     blocked_by: []
-    status: pending
+    status: completed
+    evidence: ".maestro/decisions/ADR-001-tech-stack.md"
 
   - id: T1.3
     subject: "Pedagogical model validation"
@@ -25,7 +27,8 @@ phase_1_foundation:
     owner: MSTR-03
     contributors: [MSTR-15, MSTR-22]
     blocked_by: []
-    status: pending
+    status: completed
+    evidence: ".maestro/decisions/ADR-002-pedagogical-model.md"
 
 phase_2_architecture:
   - id: T2.1
@@ -34,7 +37,8 @@ phase_2_architecture:
     owner: MSTR-04
     contributors: []
     blocked_by: [T1.1, T1.2, T1.3]
-    status: pending
+    status: completed
+    evidence: "docs/architecture/HLD-001-multi-agent-system.md, .maestro/decisions/ADR-003-orchestrator-pattern.md"
 
   - id: T2.2
     subject: "Knowledge graph & curriculum architecture"
@@ -42,7 +46,8 @@ phase_2_architecture:
     owner: MSTR-05
     contributors: []
     blocked_by: [T1.1, T1.3]
-    status: pending
+    status: completed
+    evidence: "docs/architecture/HLD-002-knowledge-graph.md"
 
   - id: T2.3
     subject: "Content generation & multimodal architecture"
@@ -50,7 +55,8 @@ phase_2_architecture:
     owner: MSTR-06
     contributors: []
     blocked_by: [T1.1, T1.3, T2.1]
-    status: pending
+    status: completed
+    evidence: "docs/architecture/HLD-003-content-generation.md"
 
   - id: T2.4
     subject: "Data & mastery state architecture"
@@ -58,7 +64,8 @@ phase_2_architecture:
     owner: MSTR-07
     contributors: []
     blocked_by: [T1.1, T1.2, T1.3]
-    status: pending
+    status: completed
+    evidence: "docs/architecture/HLD-004-data-mastery-state.md, .maestro/decisions/ADR-004-data-model.md"
 
   - id: T2.5
     subject: "Cross-component interface contracts + production HLD ratification"
@@ -66,7 +73,8 @@ phase_2_architecture:
     owner: MSTR-02
     contributors: []
     blocked_by: [T2.1, T2.2, T2.3, T2.4]
-    status: pending
+    status: completed
+    evidence: "docs/architecture/interface-contracts.md, docs/architecture/production-HLD.md, .maestro/decisions/ADR-005-interface-resolution.md"
 
 phase_3_compliance_and_safety:
   - id: T3.1

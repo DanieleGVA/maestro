@@ -26,9 +26,9 @@ I requisiti non funzionali (privacy, sicurezza, etica, accessibilità) **non div
 
 - **Template Cockburn**: ID, scope, livello, attore primario, stakeholder, precondizioni, trigger, scenario principale, estensioni, post-condizioni, requisiti speciali, riferimenti.
 - **Tre livelli di granularità**:
-  - *Summary* (cloud, ☁️) — flussi macro per orientamento esecutivo;
-  - *User goal* (sea, 🌊) — cuore del catalogo, livello azionabile per il design;
-  - *Subfunction* (fish, 🐟) — solo per meccanismi critici (Safeguarding, Bilingual Composer, mapping errore→KG, transizioni di stato del KMM).
+  - *Summary* (cloud) — flussi macro per orientamento esecutivo;
+  - *User goal* (sea) — cuore del catalogo, livello azionabile per il design;
+  - *Subfunction* (fish) — solo per meccanismi critici (Safeguarding, Bilingual Composer, mapping errore→KG, transizioni di stato del KMM).
 - **Tecniche di identificazione**: actor-goal list per ciascuno dei cinque attori, event analysis sui trigger temporali (verifica caricata, retention check D+3/D+7/D+21, lacuna persistente da 14 giorni), state analysis sulla macchina a stati di F11, CRUD analysis sulle entità chiave.
 - **Naming convention**: `UC-<attore>-<NN>` per gli UC esterni, `UC-SYS-<NN>` per i flussi interni di sistema.
 
@@ -63,104 +63,13 @@ I requisiti non funzionali (privacy, sicurezza, etica, accessibilità) **non div
 
 Lista di partenza derivata dai requisiti v0.2. Da raffinare in Fase 1. Totale candidati: **~58 UC** (40 esterni + 18 di sistema).
 
-### 4.1 Attore: Studente
+I candidati UC sono suddivisi nei seguenti file per attore:
 
-| ID | Use case | Riferimenti RF | Priorità |
-|---|---|---|---|
-| UC-ST-00 | Attivare per la prima volta l'account (post-creazione, pre-profilazione) | F14.6 | MVP |
-| UC-ST-01 | Completare onboarding e profilazione learning style | F3.1–F3.5 | MVP |
-| UC-ST-02 | Consultare il proprio documento di ripasso personalizzato | F4, F5 | MVP |
-| UC-ST-03 | Ascoltare podcast a due voci su un concetto | F6 | V1 |
-| UC-ST-04 | Esercitarsi su una quest giornaliera/settimanale | F7.5 | V1 |
-| UC-ST-06 | Chiedere "perché mi stai mostrando questo" | N7 | MVP |
-| UC-ST-07 | Modificare preferenze di profilo (tono, lunghezza, canale, granularità) | F1.8, F3.4–F3.6, F8 | MVP |
-| UC-ST-08 | Attivare/disattivare il bilinguismo | F13.9 | MVP |
-| UC-ST-09 | Spiegare a voce un concetto al sistema (rubber duck) | F10.4 | V2 |
-| UC-ST-10 | Disattivare la gamification | F7.8 | V1 |
-| UC-ST-11 | Richiedere oblio dei propri dati | N1, F14.9 | MVP |
-| UC-ST-12 | Passare da articolazione testo ad audio mantenendo il contesto | F10.2 | V1 |
-| UC-ST-13 | Consultare la propria mappa della conoscenza (vista semaforo) | F11.1–F11.3, F11.11 | MVP |
-| UC-ST-14 | Consultare la heatmap temporale delle proprie lacune | F11.13 | V1 |
-| UC-ST-15 | Avviare un percorso di approfondimento su una lacuna | F11.6, F11.7 | MVP |
-| UC-ST-16 | Sostenere il mini-quiz di chiusura di una lacuna | F11.8, F11.9 | MVP |
-
-*Note*: UC-ST-05 della v0.1 ("Visualizzare il proprio knowledge graph") è confluito in UC-ST-13, ora più specifico e ricco.
-
-### 4.2 Attore: Docente
-
-| ID | Use case | Riferimenti RF | Priorità |
-|---|---|---|---|
-| UC-DOC-01 | Caricare una lezione (audio/video/slide) | F2.1, F2.7 | MVP |
-| UC-DOC-02 | Rifinire la trascrizione automatica della lezione | F2.2–F2.3 | MVP |
-| UC-DOC-03 | Validare il mapping della lezione sui nodi del KG | F2.4 | MVP |
-| UC-DOC-04 | Caricare una verifica per diagnostica formativa | F4.1–F4.5 | MVP |
-| UC-DOC-05 | Generare una verifica bilanciata sul programma | F12.3 | V2 |
-| UC-DOC-06 | Consultare heatmap dei gap di classe | F11.14, F12.1, F12.4 | V1 |
-| UC-DOC-08 | Modificare o cancellare un contenuto generato dal sistema | F12.5 | MVP |
-| UC-DOC-09 | Definire la lingua ufficiale del corso | F13.1–F13.3 | MVP |
-| UC-DOC-10 | Aggiornare il knowledge graph del programma | F1.4, F1.9 | MVP |
-| UC-DOC-11 | Visualizzare le lacune di copertura del materiale | F2.12 | V1 |
-| UC-DOC-12 | Iscrivere uno studente al proprio corso/classe | F14.5 | MVP |
-| UC-DOC-13 | Rimuovere uno studente dal proprio corso | F14.5 | V1 |
-| UC-DOC-14 | Consultare la mappa della conoscenza di un singolo studente | F11.1, F12.2 | MVP |
-| UC-DOC-15 | Consultare la heatmap delle lacune di classe nel tempo | F11.14 | V1 |
-| UC-DOC-16 | Forzare manualmente lo stato di un nodo (override tracciato) | F11.12 | V1 |
-| UC-DOC-17 | Configurare livello scolastico e granularità di default del corso | F1.6, F1.8, F1.9 | MVP |
-| UC-DOC-18 | Consultare il pannello dei propri override (autoverifica) | F12.6 | V1 |
-| UC-DOC-19 | Ricevere e gestire alert su lacune persistenti di classe | F11.15 | V1 |
-
-*Note*: UC-DOC-07 della v0.1 ("Visualizzare il profilo gap di un singolo studente") è confluito in UC-DOC-14, ora più specifico e completo.
-
-### 4.3 Altri attori
-
-| ID | Use case | Attore | Riferimenti RF/NF | Priorità |
-|---|---|---|---|---|
-| UC-FAM-00 | Registrare il consenso al trattamento dati del minore (granulare) | Famiglia | F14.3, N1 | MVP |
-| UC-FAM-02 | Consultare il report mensile sui progressi | Famiglia | F11.16 | V1 |
-| UC-FAM-03 | Esercitare diritto all'oblio per il minore | Famiglia | F14.9, N1 | MVP |
-| UC-FAM-04 | Aggiornare il consenso (es. valorizzare lingua nativa successivamente) | Famiglia | F14.3, F13.5 | V1 |
-| UC-COR-01 | Consultare dati aggregati di corso/classe | Coordinatore | F12.1, F11.14 | V1 |
-| UC-AS-01 | Configurare SSO con il registro elettronico | IT scuola | N2 | V1 |
-| UC-AS-02 | Gestire utenze e ruoli | IT scuola | N2 | MVP |
-| UC-AS-03 | Consultare audit log degli accessi a dati di minori | IT scuola | N1, N2, F14.10 | MVP |
-| UC-AS-04 | Importare massivamente studenti dal registro elettronico | IT scuola | F14.2 | V2 |
-| UC-AS-05 | Creare manualmente un singolo studente | IT scuola | F14.2 | MVP |
-| UC-AS-06 | Aggiornare l'anagrafica studente (passaggio di classe) | IT scuola | F14.7 | V1 |
-| UC-AS-07 | Sospendere/disattivare uno studente | IT scuola | F14.8 | V1 |
-| UC-AS-08 | Cancellare definitivamente lo studente (oblio) | IT scuola | F14.9 | MVP |
-
-### 4.4 Use case di sistema (subfunction)
-
-| ID | Use case | Riferimenti | Priorità |
-|---|---|---|---|
-| UC-SYS-01 | Generare un documento di ripasso personalizzato | F5 | MVP |
-| UC-SYS-02 | Mappare un errore di verifica al micro-nodo concettuale | F4.2 | MVP |
-| UC-SYS-03 | Aggiornare il vettore di learning style sul comportamento osservato | F3.3 | V1 |
-| UC-SYS-04 | Validare un output con il Safeguarding Agent | N3 | MVP |
-| UC-SYS-05 | Comporre output in doppia lingua (Bilingual Composer) | F13.7–F13.14 | MVP |
-| UC-SYS-06 | Rilevare pattern di disagio e attivare alert | N3 | V1 |
-| UC-SYS-07 | Pianificare ripasso con spaced repetition | F11.10 | V1 |
-| UC-SYS-08 | Rilevare lettura squilibrata sulla colonna lingua nativa | F13.20 | V1 |
-| UC-SYS-09 | Rilevare una lacuna e impostare lo stato a `lacuna` | F4.3, F11.4 | MVP |
-| UC-SYS-10 | Generare percorso di approfondimento personalizzato per la lacuna | F11.7 | MVP |
-| UC-SYS-11 | Generare e somministrare mini-quiz di chiusura | F11.8 | MVP |
-| UC-SYS-12 | Aggiornare stato nodo e registrare cronologia delle transizioni | F11.4, F11.5 | MVP |
-| UC-SYS-13 | Eseguire retention check programmati (D+3, D+7, D+21) | F11.10 | V1 |
-| UC-SYS-14 | Calcolare l'aggregazione macro da micro (regola stato peggiore) | F11.11 | MVP |
-| UC-SYS-15 | Adattare la granularità di vista al livello scolastico | F1.8 | MVP |
-| UC-SYS-16 | Generare il report mensile per la famiglia | F11.16 | V1 |
-| UC-SYS-17 | Tracciare in audit log un override docente | F11.12, N7 | MVP |
-| UC-SYS-18 | Rilevare regressione su nodo già a `da_consolidare` o `consolidato` | F11.4 | V1 |
-
-### 4.5 Riepilogo per priorità
-
-| Priorità | UC esterni | UC sistema | Totale |
-|---|---|---|---|
-| MVP | 19 | 10 | 29 |
-| V1 | 16 | 7 | 23 |
-| V2 | 5 | 0 | 5 |
-| Da valutare | 0 | 1 | 1 |
-| **Totale** | **40** | **18** | **58** |
+- [UC Studente](UC_studente.md) — 16 UC (UC-ST-*)
+- [UC Docente](UC_docente.md) — 18 UC (UC-DOC-*)
+- [UC Altri attori](UC_altri_attori.md) — 13 UC (Famiglia, Coordinatore, IT scuola)
+- [UC Sistema](UC_sistema.md) — 18 UC subfunction (UC-SYS-*)
+- [Riepilogo per priorità](riepilogo_priorita.md)
 
 ## 5. Standard di qualità
 
