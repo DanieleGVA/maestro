@@ -87,19 +87,34 @@
 
 ---
 
-## Prossima fase: Phase 3 — Compliance & Safety
+## Phase 3 — Compliance & Safety (MVP minimum)
 
-Tutti i blocchi di Phase 2 sono risolti. I task di Phase 3 sono:
+Spec MVP-minimum prodotta: `docs/architecture/phase3-compliance-mvp.md`
 
-| Task | Soggetto | Owner | Bloccato da | Pronto? |
-|---|---|---|---|---|
-| T3.1 | DPIA + consent design (5 consensi granulari) | MSTR-16 | T2.4 | SI |
-| T3.2 | Safeguarding policies + content moderation | MSTR-19 | T2.3 | SI |
-| T3.3 | Accessibility design system (WCAG 2.1 AA) | MSTR-17 | T2.5 | SI |
-| T3.4 | Bilingual ops MVP (ucraino + arabo) | MSTR-18 | T2.3, T2.5 | SI |
-| T3.5 | Security architecture (authn/authz, encryption, audit, pseudonymisation) | MSTR-13 | T2.5, T3.1 | Parziale (aspetta T3.1) |
+Approccio: ridotto all'osso legale per pilota con 1 scuola, 1 classe, ~25 minori.
 
-**Strategia di esecuzione**: T3.1, T3.2, T3.3, T3.4 in parallelo. T3.5 parte dopo T3.1.
+| Area | Approccio MVP | Rimandato a V1 |
+|---|---|---|
+| DPIA | Documento 5 sezioni slim | DPIA formale con Garante |
+| Consenso | API + template PDF cartaceo + gate | Self-service SPID/QR |
+| Erasure | Stored procedure atomica + certificato PDF | Richiesta self-service |
+| Safeguarding | System prompt rules + regex check + keyword alert | ML classifier, escalation automatica |
+| Accessibilita' | Checklist WCAG + token colore + semantic HTML | Design system completo, test BES/DSA |
+| Bilinguismo | Glossario 200 termini (uk+ar) + Composer prompt | 6 lingue, revisori ricorrenti, UI multilingua |
+| Auth | Keycloak basic + 3 ruoli + JWT + MFA admin | SSO registro elettronico, SPID |
+| Security | pgcrypto PII + TLS + pseudonimizzazione + audit | Pen-test, Vault, WAF |
+
+### Prossima fase: Phase 4 — Implementation
+
+I task di Phase 4 sono (vedi task_dag.yaml):
+- T4.1: Backend orchestration + agent framework (MSTR-08)
+- T4.2: KG ingestion pipeline + concept mapping (MSTR-11)
+- T4.3: Content generation services (MSTR-10)
+- T4.4: Knowledge Map Manager + state store (MSTR-08)
+- T4.5: F14 admin path (MSTR-08)
+- T4.6: Student mobile app MVP (MSTR-09)
+- T4.7: Teacher dashboard (MSTR-09)
+- T4.8: Bilingual MVP (MSTR-18)
 
 ---
 
