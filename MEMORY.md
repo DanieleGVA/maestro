@@ -3,7 +3,7 @@
 > Questo file cattura lo stato operativo del progetto e fornisce a ogni nuova sessione di Claude il contesto necessario per riprendere il lavoro. Aggiornare a ogni milestone significativa.
 
 **Ultimo aggiornamento**: 2026-05-18
-**Fase corrente**: Phase 2 COMPLETATA — Phase 3 (Compliance & Safety) pronta a partire
+**Fase corrente**: Phase 2 COMPLETATA — Phase 3 (Compliance & Safety) ridotta: solo Safeguarding + Accessibilita' + Security
 **Task DAG**: `.maestro/tasks/task_dag.yaml`
 
 ---
@@ -87,34 +87,36 @@
 
 ---
 
-## Phase 3 — Compliance & Safety (MVP minimum)
+## Phase 3 — Compliance & Safety (MVP ridotto)
 
-Spec MVP-minimum prodotta: `docs/architecture/phase3-compliance-mvp.md`
+Spec: `docs/architecture/phase3-compliance-mvp.md`
 
-Approccio: ridotto all'osso legale per pilota con 1 scuola, 1 classe, ~25 minori.
+**Decisione Daniele**: DPIA, consenso e bilinguismo rimandati interamente a V1. MVP include solo safeguarding, accessibilita' e security.
 
-| Area | Approccio MVP | Rimandato a V1 |
+| Area | MVP | V1 |
 |---|---|---|
-| DPIA | Documento 5 sezioni slim | DPIA formale con Garante |
-| Consenso | API + template PDF cartaceo + gate | Self-service SPID/QR |
-| Erasure | Stored procedure atomica + certificato PDF | Richiesta self-service |
+| DPIA | -- | Documento slim + DPIA formale Garante |
+| Consenso | -- | API + template PDF + gate + self-service |
+| Erasure | -- | Stored procedure + certificato PDF |
+| Bilinguismo | -- | Glossario 200 termini (uk+ar) + Composer + 6 lingue |
 | Safeguarding | System prompt rules + regex check + keyword alert | ML classifier, escalation automatica |
 | Accessibilita' | Checklist WCAG + token colore + semantic HTML | Design system completo, test BES/DSA |
-| Bilinguismo | Glossario 200 termini (uk+ar) + Composer prompt | 6 lingue, revisori ricorrenti, UI multilingua |
 | Auth | Keycloak basic + 3 ruoli + JWT + MFA admin | SSO registro elettronico, SPID |
 | Security | pgcrypto PII + TLS + pseudonimizzazione + audit | Pen-test, Vault, WAF |
 
-### Prossima fase: Phase 4 — Implementation
+**Impatto su task DAG**: T3.1 (DPIA+consenso) e T3.4 (bilinguismo) rimandati a V1. T3.5 non dipende piu' da T3.1. T4.5 (F14 admin path) e T4.8 (bilingual MVP) rimandati a V1.
 
-I task di Phase 4 sono (vedi task_dag.yaml):
+### Prossima fase: Phase 4 — Implementation (MVP ridotto)
+
+I task di Phase 4 MVP sono (vedi task_dag.yaml):
 - T4.1: Backend orchestration + agent framework (MSTR-08)
 - T4.2: KG ingestion pipeline + concept mapping (MSTR-11)
 - T4.3: Content generation services (MSTR-10)
 - T4.4: Knowledge Map Manager + state store (MSTR-08)
-- T4.5: F14 admin path (MSTR-08)
 - T4.6: Student mobile app MVP (MSTR-09)
 - T4.7: Teacher dashboard (MSTR-09)
-- T4.8: Bilingual MVP (MSTR-18)
+
+Rimandati a V1: T4.5 (F14 admin path — dipende da T3.1 consenso), T4.8 (bilingual MVP — dipende da T3.4)
 
 ---
 
@@ -175,4 +177,4 @@ maestro/
 3. Per lo stato dei task: leggere `.maestro/tasks/task_dag.yaml`
 4. Per le decisioni prese: leggere gli ADR in `.maestro/decisions/`
 5. Per i requisiti: leggere `docs/MAESTRO_requisiti_v0.3.md`
-6. Per lanciare Phase 3: creare un team con gli agenti MSTR-16, MSTR-19, MSTR-17, MSTR-18, MSTR-13
+6. Per lanciare Phase 3 MVP: creare un team con gli agenti MSTR-19, MSTR-17, MSTR-13 (MSTR-16 e MSTR-18 rimandati a V1)

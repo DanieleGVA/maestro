@@ -83,7 +83,8 @@ phase_3_compliance_and_safety:
     owner: MSTR-16
     contributors: []
     blocked_by: [T2.4]
-    status: pending
+    status: deferred_v1
+    note: "Decisione Daniele: DPIA e consenso rimandati a V1"
 
   - id: T3.2
     subject: "Safeguarding policies + content moderation flows"
@@ -107,15 +108,17 @@ phase_3_compliance_and_safety:
     owner: MSTR-18
     contributors: []
     blocked_by: [T2.3, T2.5]
-    status: pending
+    status: deferred_v1
+    note: "Decisione Daniele: bilinguismo rimandato a V1"
 
   - id: T3.5
     subject: "Security architecture (authn/authz, encryption, audit, pseudonymisation)"
     description: "Security architecture: SSO, encryption, secrets, threat model, pseudonymisation"
     owner: MSTR-13
     contributors: []
-    blocked_by: [T2.5, T3.1]
+    blocked_by: [T2.5]
     status: pending
+    note: "Dipendenza da T3.1 rimossa (T3.1 deferred a V1)"
 
 phase_4_implementation:
   - id: T4.1
@@ -156,7 +159,8 @@ phase_4_implementation:
     owner: MSTR-08
     contributors: []
     blocked_by: [T2.4, T3.1, T3.5]
-    status: pending
+    status: deferred_v1
+    note: "Dipende da T3.1 (deferred). Consenso e erasure rimandati a V1"
 
   - id: T4.6
     subject: "Student mobile app MVP"
@@ -180,7 +184,8 @@ phase_4_implementation:
     owner: MSTR-18
     contributors: []
     blocked_by: [T3.4, T4.3, T4.6]
-    status: pending
+    status: deferred_v1
+    note: "Dipende da T3.4 (deferred). Bilinguismo rimandato a V1"
 
 phase_5_testing_and_verification:
   - id: T5.1
@@ -188,8 +193,9 @@ phase_5_testing_and_verification:
     description: "Build unit tests (>=80% coverage) and integration tests (>=60% critical paths)"
     owner: MSTR-14
     contributors: []
-    blocked_by: [T4.1, T4.2, T4.3, T4.4, T4.5]
+    blocked_by: [T4.1, T4.2, T4.3, T4.4]
     status: pending
+    note: "Rimossa dipendenza da T4.5 (deferred a V1)"
 
   - id: T5.2
     subject: "E2E acceptance tests (student + teacher journeys)"
@@ -212,24 +218,27 @@ phase_5_testing_and_verification:
     description: "Automated + manual security testing, remediation"
     owner: MSTR-13
     contributors: []
-    blocked_by: [T4.5, T4.7]
+    blocked_by: [T4.7]
     status: pending
+    note: "Rimossa dipendenza da T4.5 (deferred a V1)"
 
   - id: T5.5
     subject: "Pedagogical efficacy test design + first run"
     description: "Test generated content against pedagogical quality bar, first efficacy measurement"
     owner: MSTR-22
     contributors: [MSTR-14, MSTR-15]
-    blocked_by: [T4.3, T4.4, T4.8]
+    blocked_by: [T4.3, T4.4]
     status: pending
+    note: "Rimossa dipendenza da T4.8 (deferred a V1)"
 
   - id: T5.6
     subject: "Bias & safety audit (content + safeguarding)"
     description: "Gender, geographic, socio-economic, cultural bias testing + safeguarding validation"
     owner: MSTR-19
     contributors: [MSTR-14]
-    blocked_by: [T4.3, T4.8]
+    blocked_by: [T4.3]
     status: pending
+    note: "Rimossa dipendenza da T4.8 (deferred a V1)"
 
 phase_6_deployment:
   - id: T6.1

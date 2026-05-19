@@ -1,64 +1,41 @@
 # Phase 3 — Compliance & Safety: MVP Minimum
 
 > Versione ridotta all'osso per MVP (1 scuola, 1 classe, 1 docente, ~25 studenti minori).
-> Ogni sezione indica cosa e' legalmente obbligatorio vs cosa si puo' rimandare a V1.
+> Solo safeguarding, accessibilita' e security sono in scope MVP. DPIA, consenso e bilinguismo rimandati a V1.
 
 ---
 
-## T3.1 — DPIA + Consenso (MVP minimum)
+## Scope MVP vs V1
 
-### DPIA slim
+| Area | MVP | V1 |
+|---|---|---|
+| **DPIA** | -- | Documento 5 sezioni slim + DPIA formale Garante |
+| **Consenso** | -- | API + template PDF + gate + self-service SPID/QR |
+| **Right to erasure** | -- | Stored procedure atomica + certificato PDF |
+| **Bilinguismo** | -- | Glossario 200 termini (uk+ar) + Composer prompt + espansione 6 lingue |
+| **Safeguarding** | System prompt rules + regex check + keyword alert | ML classifier, escalation automatica |
+| **Accessibilita'** | Checklist WCAG + token colore + semantic HTML | Design system completo, test BES/DSA |
+| **Auth** | Keycloak basic + 3 ruoli + JWT + MFA admin | SSO registro elettronico, SPID |
+| **Security** | pgcrypto PII + TLS + pseudonimizzazione + audit | Pen-test, Vault, WAF |
 
-Il GDPR Art. 35 richiede una DPIA quando il trattamento comporta rischio elevato per i diritti dei minori. Per MVP e' sufficiente un documento strutturato — non serve un tool enterprise.
-
-**Sezioni obbligatorie della DPIA MVP:**
-
-1. **Descrizione del trattamento**: cosa raccogliamo, per chi (minori 13-19), base giuridica (consenso genitoriale Art. 8), finalita' (apprendimento personalizzato)
-2. **Necessita' e proporzionalita'**: perche' ogni dato e' necessario, non raccogliamo piu' del minimo
-3. **Rischi per gli interessati**: profilazione di minori, lingua nativa come dato Art. 9, LLM esterno
-4. **Misure di mitigazione**: pseudonimizzazione, EU residency, consenso granulare, right to erasure
-5. **Parere DPO**: da ottenere prima del pilota (OQ11 — serve conferma da Daniele se DPO esterno o liaison)
-
-**Rimandato a V1**: valutazione d'impatto formale con Garante Privacy, certificazione MIUR.
-
-### 5 Consensi granulari — MVP implementation
-
-I 5 consensi sono non negoziabili (CLAUDE.md). Per MVP il flusso e' **amministrato** (F14.4):
-
-| Consenso | Tipo | Base giuridica | Se negato |
-|---|---|---|---|
-| (a) Profilazione adattamento | Opt-in | Art. 6(1)(a) + Art. 8 | Profilo uniforme, contenuti non personalizzati |
-| (b) Lingua nativa | Opt-in | Art. 9(2)(a) esplicito | Nessun bilinguismo, contenuti solo in lingua ufficiale |
-| (c) Comunicazioni famiglia | Opt-in | Art. 6(1)(a) | Nessun report mensile, famiglia non riceve comunicazioni |
-| (d) Storico cross-anno | Opt-in | Art. 6(1)(a) + Art. 8 | Mappa azzerata a ogni anno scolastico |
-| (e) Ricerca anonima | Opt-in | Art. 6(1)(a) | Dati non inclusi in aggregazioni anonime |
-
-**Flusso MVP:**
-1. Admin IT crea studente nel sistema (form manuale)
-2. Il sistema genera un **modulo cartaceo PDF** con i 5 consensi, linguaggio chiaro per genitori, in italiano
-3. Il docente distribuisce, raccoglie firmati, l'admin registra nel sistema il flag per ogni consenso
-4. Lo studente riceve credenziali solo dopo che almeno i consensi obbligatori sono registrati
-
-**Cosa serve implementare:**
-- Endpoint `POST /admin/students/{id}/consents` che accetta un array di `{type: "a"|"b"|"c"|"d"|"e", granted: bool, granted_at: date}`
-- Template PDF generabile con i 5 consensi (testo fisso, genera con dati studente)
-- Tabella `core.consent` gia' nel DDL di HLD-004
-- Gate applicativo: se consenso (a) = negato, il Profiler Agent ritorna profilo uniforme. Se (b) = negato, Bilingual Composer non si attiva.
-
-**Rimandato a V1**: flusso self-service via link/QR + SPID, UI di gestione consensi per la famiglia.
-
-### Right to erasure — MVP minimum
-
-- Stored procedure atomica gia' progettata in HLD-004
-- MVP: richiesta via admin IT (form), esecuzione entro 30 giorni
-- Genera certificato di cancellazione PDF
-- Audit log pseudonimizzato preservato
-
-**Rimandato a V1**: richiesta self-service da famiglia/studente via UI.
+> **Decisione**: DPIA, consenso e bilinguismo sono rimandati interamente a V1 per ridurre lo scope MVP al minimo tecnico necessario per il pilota. Il pilota MVP opera senza profilazione personalizzata, senza bilinguismo e con consenso gestito fuori sistema (cartaceo). La tabella `core.consent` e la stored procedure di erasure restano nel DDL ma non vengono implementate a livello applicativo nel MVP.
 
 ---
 
-## T3.2 — Safeguarding (MVP minimum)
+## T3.1 — DPIA + Consenso (RIMANDATO A V1)
+
+Tutto il contenuto di T3.1 e' rimandato a V1:
+- DPIA slim (5 sezioni)
+- 5 consensi granulari (API + template PDF + gate applicativi)
+- Right to erasure (stored procedure + certificato PDF)
+
+**Rationale**: per il pilota MVP con 1 classe e ~25 studenti, il consenso viene gestito fuori sistema (cartaceo scolastico standard). Il sistema non raccoglie PII oltre username/password gestiti da Keycloak. La profilazione adattiva (F3) e il bilinguismo non sono attivi, quindi i consensi (a) e (b) non si applicano. I consensi (c), (d), (e) non sono rilevanti senza le funzionalita' corrispondenti.
+
+**Per V1**: implementare l'intero flusso come da spec originale (vedi git history per il dettaglio).
+
+---
+
+## T3.2 — Safeguarding (MVP)
 
 ### Cosa e' obbligatorio per MVP
 
@@ -119,7 +96,7 @@ WELLBEING_KEYWORDS = [
 
 ---
 
-## T3.3 — Accessibilita' (MVP minimum)
+## T3.3 — Accessibilita' (MVP)
 
 ### WCAG 2.1 AA — checklist MVP
 
@@ -155,37 +132,20 @@ Non serve un design system completo. Serve una **checklist vincolante** + token 
 
 ---
 
-## T3.4 — Bilinguismo (MVP minimum)
+## T3.4 — Bilinguismo (RIMANDATO A V1)
 
-### Scope MVP: 2 lingue (ucraino + arabo)
+Tutto il contenuto di T3.4 e' rimandato a V1:
+- Glossario tecnico controllato (200 termini, uk + ar)
+- Bilingual Composer prompt
+- Gate consenso (b)
 
-**Cosa serve:**
+**Rationale**: il pilota MVP opera solo in lingua italiana. Il bilinguismo richiede il consenso (b) per la lingua nativa (Art. 9) che e' anch'esso rimandato a V1.
 
-1. **Glossario tecnico controllato** per ucraino e arabo
-   - ~200 termini IT di base (variabile, funzione, ciclo, array, oggetto, classe, sessione, query, etc.)
-   - Formato: JSON `{term_it: string, term_uk: string, term_ar: string, context: string}`
-   - Curato manualmente una tantum, revisionato da madrelingua prima del pilota
-   - Usato dal Bilingual Composer come lookup constraint nei prompt
-
-2. **Bilingual Composer prompt** (gia' specificato in HLD-003)
-   - Genera in lingua ufficiale → adatta in lingua nativa (post-generation)
-   - Vincolo: glossario tecnico iniettato nel prompt, termini tecnici devono usare la traduzione dal glossario
-   - Layout output: JSON con campi `{official: string, native: string}` per ogni blocco
-
-3. **Gate consenso (b)**: se negato, il Bilingual Composer non si attiva. Gia' nel flusso orchestratore.
-
-**Cosa NON serve per MVP:**
-- Revisore madrelingua in produzione (basta una revisione pre-pilota del glossario)
-- SLA di qualita' traduzione
-- Podcast cross-language (V1)
-- Rilevamento lettura squilibrata F13.20 (V1)
-- UI in ucraino/arabo N9 (V1 — MVP: UI solo italiano)
-
-**Rimandato a V1**: espansione a 6 lingue, revisori madrelingua ricorrenti, N9 (UI multilingua), podcast bilingue, rilevamento F13.20.
+**Per V1**: glossario 200 termini (uk + ar), Bilingual Composer con gate consenso, espansione a 6 lingue.
 
 ---
 
-## T3.5 — Security (MVP minimum)
+## T3.5 — Security (MVP)
 
 ### Autenticazione
 
@@ -223,7 +183,7 @@ PSEUDONYMIZATION_RULES = {
 }
 ```
 
-Session-scoped: la mappa pseudo → reale vive solo in memoria per la durata della richiesta. Mai persistita.
+Session-scoped: la mappa pseudo -> reale vive solo in memoria per la durata della richiesta. Mai persistita.
 
 ### Audit log
 
@@ -250,23 +210,24 @@ Session-scoped: la mappa pseudo → reale vive solo in memoria per la durata del
 
 ### Must-have (bloccanti per pilota)
 
-| Area | Deliverable | Effort stimato |
-|---|---|---|
-| DPIA | Documento 5 sezioni in `.maestro/dpia/dpia-mvp.md` | 1 documento |
-| Consenso | Endpoint API + template PDF + gate applicativi | ~2 giorni dev |
-| Erasure | Stored procedure + certificato PDF | Gia' nel DDL |
-| Safeguarding | System prompt rules + regex check + keyword alert | ~1 giorno dev |
-| Accessibilita' | Checklist + token colore + font + semantic HTML | Integrato nello sviluppo UI |
-| Bilinguismo | Glossario JSON 200 termini (uk + ar) + prompt Composer | ~3 giorni (1 dev + revisione) |
-| Auth | Keycloak basic + 3 ruoli + JWT + MFA admin | ~2 giorni dev |
-| Crittografia | pgcrypto su PII + TLS | ~1 giorno dev |
-| Pseudonimizzazione | LLM Gateway rules | Gia' nell'architettura |
-| Audit log | Trigger + export | Gia' nel DDL |
+| Area | Deliverable |
+|---|---|
+| Safeguarding | System prompt rules + regex check + keyword alert |
+| Accessibilita' | Checklist + token colore + font + semantic HTML |
+| Auth | Keycloak basic + 3 ruoli + JWT + MFA admin |
+| Crittografia | pgcrypto su PII + TLS |
+| Pseudonimizzazione | LLM Gateway rules |
+| Audit log | Trigger + export |
 
-### Esplicitamente rimandato a V1
+### Rimandato a V1 (era precedentemente in scope MVP)
 
-- DPIA formale con Garante Privacy
-- Consenso self-service (SPID/QR)
+- **DPIA**: documento 5 sezioni slim + DPIA formale Garante
+- **Consenso**: 5 consensi granulari (API + template PDF + gate applicativi)
+- **Right to erasure**: stored procedure + certificato PDF (DDL gia' presente)
+- **Bilinguismo**: glossario 200 termini (uk + ar) + Bilingual Composer + espansione 6 lingue
+
+### Esplicitamente rimandato a V1 (gia' fuori scope MVP)
+
 - SSO con registro elettronico
 - ML safeguarding classifier
 - Design system completo (Storybook)
@@ -274,22 +235,16 @@ Session-scoped: la mappa pseudo → reale vive solo in memoria per la durata del
 - UI in ucraino/arabo (N9)
 - Pen-test formale
 - Key management (Vault)
-- Espansione a 6 lingue
 - Revisori madrelingua ricorrenti
 
 ---
 
 ## Checklist gate Phase 3 MVP
 
-- [ ] DPIA slim presente in `.maestro/dpia/dpia-mvp.md`
-- [ ] 5 consensi implementati (API + template PDF + gate)
-- [ ] Right to erasure funzionante (stored procedure + certificato)
 - [ ] Safeguarding rules nel system prompt + regex check post-generazione
 - [ ] Wellbeing keyword alert implementato
 - [ ] Token colore con contrasto verificato
 - [ ] Semantic HTML + keyboard nav + ARIA su componenti custom
-- [ ] Glossario tecnico bilingue (uk + ar) curato e revisionato
-- [ ] Bilingual Composer funzionante con gate consenso (b)
 - [ ] Keycloak configurato con 3 ruoli + MFA admin
 - [ ] PII crittografati at rest (pgcrypto)
 - [ ] TLS 1.3 su tutti gli endpoint
