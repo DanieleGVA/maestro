@@ -179,92 +179,35 @@ Safe to compact: verbose intermediate reasoning, superseded drafts, exploratory 
 
 ---
 
-## Current Project Status
+## Project Status & Memory
 
-**Last updated**: 2026-05-18
-**Current phase**: Phase 2 COMPLETE — Phase 3 (Compliance & Safety) ready to start
-**Task DAG**: `.maestro/tasks/task_dag.yaml` (T1.1–T2.5 completed, T3.1+ pending)
-
-### Completed Phases
-
-**Phase 1 — Foundation (COMPLETE)**
-- T1.1: Requirements v0.3 synthesis → `docs/MAESTRO_requisiti_v0.3.md`
-- T1.2: Tech stack revalidation → `.maestro/decisions/ADR-001-tech-stack.md`
-- T1.3: Pedagogical model validation → `.maestro/decisions/ADR-002-pedagogical-model.md`
-
-**Phase 2 — Architecture (COMPLETE)**
-- T2.1: Multi-agent system HLD → `docs/architecture/HLD-001-multi-agent-system.md` + `.maestro/decisions/ADR-003-orchestrator-pattern.md`
-- T2.2: KG & curriculum architecture → `docs/architecture/HLD-002-knowledge-graph.md`
-- T2.3: Content generation architecture → `docs/architecture/HLD-003-content-generation.md`
-- T2.4: Data & mastery state architecture → `docs/architecture/HLD-004-data-mastery-state.md` + `.maestro/decisions/ADR-004-data-model.md`
-- T2.5: Interface contracts + production HLD → `docs/architecture/interface-contracts.md` + `docs/architecture/production-HLD.md` + `.maestro/decisions/ADR-005-interface-resolution.md`
-
-### Key Architecture Decisions (ADR Summary)
-
-| ADR | Decision | Rationale |
-|---|---|---|
-| ADR-001 | PostgreSQL-centric stack (pgvector + Apache AGE + relational in single PG17 instance) | Single backup, ACID across domains, EU residency, MVP cost EUR 300-520/mo |
-| ADR-001 | Claude API primary + GPT-4o-mini batch, via LLMGateway abstraction | Pseudonymization at boundary, model routing, cost optimization |
-| ADR-001 | LangGraph + FastAPI backend, React Native + Expo (student), Next.js (teacher) | Durable checkpointing for audit, native accessibility APIs |
-| ADR-001 | Hetzner Cloud (DE/FI) + Scaleway (FR), Keycloak auth | EU-native, no CLOUD Act, SAML 2.0 + OIDC + MFA |
-| ADR-002 | "Content-adaptation profile" not "learning styles"; 5-dim continuous vector | Pashler 2009, Newton 2015 — avoid contested fixed-trait claims |
-| ADR-002 | 6-state machine validated (Bloom mastery learning, Guskey corrective instruction) | Quiz threshold >=80%, regression conservative but justified |
-| ADR-002 | Retention: MVP fixed D+7, V1 D+3/D+7/D+21, V2 FSRS adaptive | FSRS columns present from day 1 for migration readiness |
-| ADR-002 | Rollup: worst-state + UI progress indicator ("7/10 consolidati") | Pedagogically rigorous + encouraging UX |
-| ADR-003 | Central LangGraph StateGraph orchestrator (not event bus) | Consent/safeguarding gates are structural, not policy-based |
-| ADR-004 | 4 PostgreSQL schemas (core/kmm/content/audit), append-only audit | Application-level state machine, atomic right-to-erasure, pgcrypto encryption |
-| ADR-005 | 7 cross-HLD conflicts resolved (state ordering, schema naming, table merges) | Canonical state ordering: lacuna < in_recupero < non_introdotto < introdotto < da_consolidare < consolidato |
-
-### Open Questions Resolved
-
-- **OQ7** (mini-quiz source): teacher-first + AI-generated with 5-layer quality framework (ADR-002)
-- **OQ8** (rollup rule): worst-state validated with two-tier display enhancement (ADR-002)
-
-### Open Questions Still Pending
-
-- OQ1: LLM choice — decided Claude primary + GPT-4o-mini batch (ADR-001), but open-source fallback TBD
-- OQ2: Release model (SaaS vs on-premise) — post-pilot decision
-- OQ3: Pricing — escalate to Daniele
-- OQ4: Data ownership governance — from DPIA (T3.1)
-- OQ5: MIUR certification — from T3.1
-- OQ6: Efficacy study design — from T5.5
-- OQ11: DPO liaison — escalate to Daniele
-- OQ12: Pilot school confirmation — escalate to Daniele
-- OQ13-14: Linear vs Jira, Confluence vs Notion — TBD
-- OQ15: Effort Router thresholds — validate after Phase 4
-
-### Next Phase: Phase 3 — Compliance & Safety
-
-Tasks ready to start (see task_dag.yaml for dependencies):
-- T3.1: DPIA + consent design (MSTR-16) — blocked by T2.4 ✅
-- T3.2: Safeguarding policies (MSTR-19) — blocked by T2.3 ✅
-- T3.3: Accessibility design system (MSTR-17) — blocked by T2.5 ✅
-- T3.4: Bilingual ops (MSTR-18) — blocked by T2.3, T2.5 ✅
-- T3.5: Security architecture (MSTR-13) — blocked by T2.5, T3.1
+> **Stato operativo dettagliato, decisioni, contesto sessione**: vedi `MEMORY.md`
+> **Task DAG**: `.maestro/tasks/task_dag.yaml`
+> **Fase corrente**: Phase 2 completata — Phase 3 (Compliance & Safety) pronta
 
 ---
 
 ## Source Documents
 
 ### Requirements & Design
-- `docs/MAESTRO_documento_progetto_v0.2.md` — Original project requirements (F1-F14, N1-N7)
-- `docs/MAESTRO_requisiti_v0.3.md` — Consolidated requirements v0.3 (F1-F17, N1-N9, 58 UC, 42 screens)
-- `docs/MAESTRO_agent_team_v1.md` — Team architecture specification (23 agents, 32-task DAG)
-- `docs/MAESTRO_use_cases_v1.md` — Full use case catalog (58 UC, Cockburn format)
-- `docs/MAESTRO_schermate_v1.md` — Screen specifications (42 screens)
-- `docs/use_cases/` — Use case work plan, suddiviso per attore
+- `docs/MAESTRO_documento_progetto_v0.2.md` — Requisiti originali (F1-F14, N1-N7)
+- `docs/MAESTRO_requisiti_v0.3.md` — Requisiti consolidati (F1-F17, N1-N9, 58 UC, 42 schermate)
+- `docs/MAESTRO_agent_team_v1.md` — Architettura team (23 agenti, 32-task DAG)
+- `docs/MAESTRO_use_cases_v1.md` — Catalogo UC (58 UC, formato Cockburn)
+- `docs/MAESTRO_schermate_v1.md` — Specifiche schermate (42 schermate)
+- `docs/use_cases/` — UC suddivisi per attore
 
-### Architecture (Phase 2 deliverables)
-- `docs/architecture/production-HLD.md` — **START HERE** — Unified production HLD, system overview
-- `docs/architecture/HLD-001-multi-agent-system.md` — 15 agents, orchestration, flows, safeguarding
-- `docs/architecture/HLD-002-knowledge-graph.md` — KG schema, ingestion, concept mapping, DDL
-- `docs/architecture/HLD-003-content-generation.md` — Text agent, prompts, bilingual, quiz, caching
-- `docs/architecture/HLD-004-data-mastery-state.md` — KMM state store, F14 data model, complete DDL
-- `docs/architecture/interface-contracts.md` — 14 typed contracts, REST API, event schemas
+### Architecture (Phase 2)
+- `docs/architecture/production-HLD.md` — **PARTIRE DA QUI** — HLD di produzione unificato
+- `docs/architecture/HLD-001-multi-agent-system.md` — 15 agenti, orchestrazione, flussi
+- `docs/architecture/HLD-002-knowledge-graph.md` — Schema KG, ingestion, concept mapping
+- `docs/architecture/HLD-003-content-generation.md` — Text agent, prompt, bilingue, quiz
+- `docs/architecture/HLD-004-data-mastery-state.md` — KMM state store, modello dati F14, DDL
+- `docs/architecture/interface-contracts.md` — 14 contratti tipizzati, REST API, event schemas
 
-### Decisions
-- `.maestro/decisions/ADR-001-tech-stack.md`
-- `.maestro/decisions/ADR-002-pedagogical-model.md`
-- `.maestro/decisions/ADR-003-orchestrator-pattern.md`
-- `.maestro/decisions/ADR-004-data-model.md`
-- `.maestro/decisions/ADR-005-interface-resolution.md`
+### Decisions (ADR)
+- `.maestro/decisions/ADR-001-tech-stack.md` — Stack tecnologico (PG17-centric, Claude+GPT, LangGraph, Hetzner EU)
+- `.maestro/decisions/ADR-002-pedagogical-model.md` — Modello pedagogico (6 stati, profilo adattamento, FSRS)
+- `.maestro/decisions/ADR-003-orchestrator-pattern.md` — Pattern orchestratore (LangGraph StateGraph)
+- `.maestro/decisions/ADR-004-data-model.md` — Architettura dati (4 schemi, audit immutabile, erasure atomico)
+- `.maestro/decisions/ADR-005-interface-resolution.md` — Risoluzione conflitti inter-HLD
