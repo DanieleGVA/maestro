@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from maestro.auth.dependencies import get_current_user
+from maestro.auth.keycloak import UserClaims
 from maestro.common.exceptions import MaestroError, NotFoundError
 from maestro.common.schemas import ApiResponse, Meta
 from maestro.db.engine import get_db
@@ -56,13 +58,15 @@ def _to_node_response(node) -> NodeResponse:  # type: ignore[no-untyped-def]
 async def ingest_lesson(
     course_id: uuid.UUID,
     body: LessonIngestRequest,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[IngestionResultResponse]:
     """Ingest a lesson: chunking, embedding, concept mapping."""
+    if user.role not in ("teacher", "admin"):
+        raise HTTPException(status_code=403, detail="Accesso non autorizzato")
     from maestro.kg.ingestion import LessonMetadata, ingest_lesson as do_ingest
 
-    # MVP: teacher_id is hardcoded; will come from JWT in production
-    teacher_id = uuid.UUID("00000000-0000-0000-0000-000000000001")
+    teacher_id = uuid.UUID(user.sub)
 
     metadata = LessonMetadata(
         course_id=course_id,
@@ -112,12 +116,15 @@ async def ingest_lesson(
 async def confirm_or_reject_mapping(
     mapping_id: uuid.UUID,
     body: MappingConfirmRequest,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[ConceptLinkResponse]:
     """Confirm or reject a concept mapping suggestion."""
+    if user.role not in ("teacher", "admin"):
+        raise HTTPException(status_code=403, detail="Accesso non autorizzato")
     from maestro.kg.ingestion import confirm_mapping, reject_mapping
 
-    teacher_id = uuid.UUID("00000000-0000-0000-0000-000000000001")
+    teacher_id = uuid.UUID(user.sub)
 
     try:
         if body.action == "confirm":
@@ -156,6 +163,7 @@ async def confirm_or_reject_mapping(
 )
 async def list_nodes(
     course_id: uuid.UUID,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[list[NodeResponse]]:
     """List all active nodes for a course."""
@@ -174,6 +182,7 @@ async def list_nodes(
 )
 async def get_node_detail(
     node_id: uuid.UUID,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[NodeDetailResponse]:
     """Get node detail with prerequisites and dependents."""
@@ -208,12 +217,15 @@ async def get_node_detail(
 async def create_node(
     course_id: uuid.UUID,
     body: MacroNodeCreate | MicroNodeCreate,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[NodeResponse]:
     """Create a macro or micro node."""
+    if user.role not in ("teacher", "admin"):
+        raise HTTPException(status_code=403, detail="Accesso non autorizzato")
     from maestro.kg.graph_ops import add_macro_node, add_micro_node
 
-    teacher_id = uuid.UUID("00000000-0000-0000-0000-000000000001")
+    teacher_id = uuid.UUID(user.sub)
 
     try:
         if isinstance(body, MicroNodeCreate):
@@ -259,12 +271,15 @@ async def create_node(
 async def update_node(
     node_id: uuid.UUID,
     body: NodeUpdate,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[NodeResponse]:
     """Update editable fields of a KG node."""
+    if user.role not in ("teacher", "admin"):
+        raise HTTPException(status_code=403, detail="Accesso non autorizzato")
     from maestro.kg.graph_ops import update_node as do_update
 
-    teacher_id = uuid.UUID("00000000-0000-0000-0000-000000000001")
+    teacher_id = uuid.UUID(user.sub)
 
     try:
         node = await do_update(
@@ -288,12 +303,15 @@ async def update_node(
 )
 async def deactivate_node(
     node_id: uuid.UUID,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[NodeResponse]:
     """Deactivate a node (soft-delete per C4 constraint)."""
+    if user.role not in ("teacher", "admin"):
+        raise HTTPException(status_code=403, detail="Accesso non autorizzato")
     from maestro.kg.graph_ops import deactivate_node as do_deactivate
 
-    teacher_id = uuid.UUID("00000000-0000-0000-0000-000000000001")
+    teacher_id = uuid.UUID(user.sub)
 
     try:
         node = await do_deactivate(session, node_id=node_id, deactivated_by=teacher_id)
@@ -316,12 +334,15 @@ async def deactivate_node(
 async def create_edge(
     course_id: uuid.UUID,
     body: EdgeCreate,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[EdgeResponse]:
     """Create an edge (DAG validation for prerequisites)."""
+    if user.role not in ("teacher", "admin"):
+        raise HTTPException(status_code=403, detail="Accesso non autorizzato")
     from maestro.kg.graph_ops import add_prerequisite_edge
 
-    teacher_id = uuid.UUID("00000000-0000-0000-0000-000000000001")
+    teacher_id = uuid.UUID(user.sub)
 
     try:
         edge = await add_prerequisite_edge(
@@ -345,12 +366,15 @@ async def create_edge(
 )
 async def remove_edge(
     edge_id: uuid.UUID,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[dict]:
     """Remove a prerequisite edge."""
+    if user.role not in ("teacher", "admin"):
+        raise HTTPException(status_code=403, detail="Accesso non autorizzato")
     from maestro.kg.graph_ops import remove_prerequisite_edge
 
-    teacher_id = uuid.UUID("00000000-0000-0000-0000-000000000001")
+    teacher_id = uuid.UUID(user.sub)
 
     try:
         await remove_prerequisite_edge(session, edge_id=edge_id, removed_by=teacher_id)
@@ -371,6 +395,7 @@ async def remove_edge(
 )
 async def get_prerequisites(
     node_id: uuid.UUID,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[list[NodeResponse]]:
     """Get prerequisite nodes for a given node."""
@@ -390,6 +415,7 @@ async def get_prerequisites(
 )
 async def get_curriculum(
     course_id: uuid.UUID,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[list[NodeResponse]]:
     """Get complete curriculum as a topologically sorted learning path."""
@@ -407,12 +433,15 @@ async def get_curriculum(
 async def load_curriculum(
     course_id: uuid.UUID,
     body: CurriculumLoadRequest,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[list[NodeResponse]]:
     """Load a full curriculum structure into the KG."""
+    if user.role not in ("teacher", "admin"):
+        raise HTTPException(status_code=403, detail="Accesso non autorizzato")
     from maestro.kg.curriculum import load_curriculum as do_load
 
-    teacher_id = uuid.UUID("00000000-0000-0000-0000-000000000001")
+    teacher_id = uuid.UUID(user.sub)
 
     try:
         nodes = await do_load(
@@ -440,6 +469,7 @@ async def semantic_search(
     course_id: uuid.UUID,
     q: str = Query(..., min_length=2),
     top_k: int = Query(5, ge=1, le=50),
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ApiResponse[list[SearchResultResponse]]:
     """Semantic search over KG nodes for a course."""

@@ -115,7 +115,6 @@ export default function QuizView({ questions, onSubmitAll, feedback }: QuizViewP
 
       {/* Options (radio group pattern) */}
       <View
-        accessible={false}
         accessibilityRole="radiogroup"
         accessibilityLabel={`Opzioni per: ${question.text}`}
       >

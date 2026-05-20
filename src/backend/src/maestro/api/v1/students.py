@@ -7,11 +7,12 @@ Per IC-12 contract (Section 14.4):
 RBAC: students access own data only. Teachers access class students. Admins access school.
 """
 
+import re
 import uuid
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -45,6 +46,23 @@ class StudentCreateRequest(BaseModel):
     email: str | None = Field(default=None, max_length=255)
     school_year: int = Field(ge=1, le=5)
     birth_year: int | None = Field(default=None, ge=2006, le=2013)
+
+    @field_validator("name", "surname")
+    @classmethod
+    def no_control_chars(cls, v: str) -> str:
+        """Reject control characters in name fields."""
+        if re.search(r"[\x00-\x1f\x7f]", v):
+            raise ValueError("Caratteri di controllo non consentiti")
+        return v.strip()
+
+    @field_validator("email")
+    @classmethod
+    def valid_email(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", v):
+            raise ValueError("Formato email non valido")
+        return v.lower().strip()
 
 
 class StudentCreatedResponse(BaseModel):

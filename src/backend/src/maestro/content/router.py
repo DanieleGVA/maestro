@@ -14,6 +14,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from maestro.auth.dependencies import get_current_user
+from maestro.auth.keycloak import UserClaims
 from maestro.content.cache import ContentCache
 from maestro.content.quiz_engine import QuizEngine
 from maestro.content.schemas import (
@@ -42,6 +44,7 @@ _cache = ContentCache()
 @router.post("/generate")
 async def generate_content(
     req: ContentGenerateRequest,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> dict:
     """Generate personalised content for a student/node.
@@ -113,6 +116,7 @@ async def generate_content(
 @router.post("/quiz/generate")
 async def generate_quiz(
     req: QuizGenerateRequest,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> dict:
     """Generate a quiz for a concept node."""
@@ -204,6 +208,7 @@ async def generate_quiz(
 async def submit_quiz(
     quiz_id: str,
     req: QuizSubmitRequest,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> dict:
     """Submit quiz answers and get evaluation results."""
@@ -285,6 +290,7 @@ async def submit_quiz(
 @router.get("/quiz/{quiz_id}")
 async def get_quiz(
     quiz_id: str,
+    user: UserClaims = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> dict:
     """Get quiz detail with questions (without correct answers for student view)."""

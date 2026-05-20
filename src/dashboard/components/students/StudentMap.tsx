@@ -78,6 +78,7 @@ export default function StudentMap({ nodes, kgNodes, onNodeClick }: StudentMapPr
                     key={m.id}
                     onClick={() => onNodeClick(m.id)}
                     className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus"
+                    aria-label={`${m.label_it}: ${MASTERY_TOKENS[s].label}`}
                     title={`${m.label_it}: ${MASTERY_TOKENS[s].label}`}
                   >
                     <StateIndicator state={s} size="sm" showLabel={false} />

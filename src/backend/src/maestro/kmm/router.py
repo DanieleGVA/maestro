@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from maestro.auth.dependencies import get_current_user, get_db
 from maestro.auth.keycloak import UserClaims
+from maestro.auth.rbac import check_own_data_or_role
 from maestro.common.exceptions import (
     NotFoundError,
     OverrideMotivationError,
@@ -44,6 +45,7 @@ async def read_student_map(
     session: AsyncSession = Depends(get_db),
 ) -> schemas.StudentMapResponse:
     """Return the full knowledge map for a student in a course."""
+    check_own_data_or_role(user, student_id)
     nodes = await get_student_map(session, student_id, course_id)
     return schemas.StudentMapResponse(
         student_id=student_id,
@@ -79,6 +81,7 @@ async def read_node_state(
     session: AsyncSession = Depends(get_db),
 ) -> schemas.NodeStateResponse:
     """Return state for a single (student, node, course)."""
+    check_own_data_or_role(user, student_id)
     sns = await get_student_state(session, student_id, node_id, course_id)
     if sns is None:
         raise NotFoundError("node_state", f"{student_id}/{node_id}")
@@ -114,6 +117,9 @@ async def create_teacher_override(
 
     Requires motivation >= 20 characters. Fully audited.
     """
+    if user.role not in ("teacher", "admin"):
+        from fastapi import HTTPException as _HTTPException
+        raise _HTTPException(status_code=403, detail="Solo i docenti possono eseguire override")
     teacher_id = user.sub
 
     try:
@@ -164,6 +170,9 @@ async def read_class_heatmap(
     session: AsyncSession = Depends(get_db),
 ) -> schemas.ClassHeatmapResponse:
     """Class-level heatmap: per-node student counts by state."""
+    if user.role not in ("teacher", "admin"):
+        from fastapi import HTTPException as _HTTPException
+        raise _HTTPException(status_code=403, detail="Solo docenti e admin possono accedere alla heatmap")
     stmt = select(Enrolment.student_id).where(
         Enrolment.course_id == _uuid.UUID(course_id),
         Enrolment.status == "active",
@@ -196,6 +205,7 @@ async def read_due_retention_checks(
     session: AsyncSession = Depends(get_db),
 ) -> list[schemas.RetentionCheckResponse]:
     """Return retention checks that are due for a student."""
+    check_own_data_or_role(user, student_id)
     checks = await get_student_due_checks(session, student_id, course_id)
     return [
         schemas.RetentionCheckResponse(

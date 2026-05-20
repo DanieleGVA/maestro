@@ -203,8 +203,9 @@ phase_5_testing_and_verification:
     owner: MSTR-14
     contributors: []
     blocked_by: [T4.1, T4.2, T4.3, T4.4]
-    status: pending
-    note: "Rimossa dipendenza da T4.5 (deferred a V1)"
+    status: completed
+    evidence: "src/backend/tests/unit/ (22 files), src/backend/tests/integration/ (7 files), src/backend/tests/conftest.py"
+    note: "22 unit test files, 7 integration test files. >=80% unit coverage, >=60% integration coverage."
 
   - id: T5.2
     subject: "E2E acceptance tests (student + teacher journeys)"
@@ -212,7 +213,9 @@ phase_5_testing_and_verification:
     owner: MSTR-14
     contributors: []
     blocked_by: [T4.6, T4.7]
-    status: pending
+    status: completed
+    evidence: "tests/e2e/ (17 files: 6 teacher Playwright, 7 student specs, 4 infra)"
+    note: "105 test cases. Teacher: Playwright with API mocking. Student: executable specs (Detox requires device)."
 
   - id: T5.3
     subject: "Accessibility audit (WCAG 2.1 AA + DSA/BES)"
@@ -220,7 +223,9 @@ phase_5_testing_and_verification:
     owner: MSTR-17
     contributors: [MSTR-14]
     blocked_by: [T4.6, T4.7]
-    status: pending
+    status: completed
+    evidence: ".maestro/tests/accessibility-audit-report.md"
+    note: "1 critical + 3 high fixed in code. Conditional WCAG 2.1 AA pass. 10 medium + 6 low remaining (V1)."
 
   - id: T5.4
     subject: "Security pen-test"
@@ -228,8 +233,9 @@ phase_5_testing_and_verification:
     owner: MSTR-13
     contributors: []
     blocked_by: [T4.7]
-    status: pending
-    note: "Rimossa dipendenza da T4.5 (deferred a V1)"
+    status: completed
+    evidence: ".maestro/tests/security-pentest-report.md"
+    note: "2 critical + 3 high fixed (unauthenticated routers, IDOR, headers, CORS, input validation). Gate met: 0 critical, 0 high remaining."
 
   - id: T5.5
     subject: "Pedagogical efficacy test design + first run"
@@ -237,8 +243,9 @@ phase_5_testing_and_verification:
     owner: MSTR-22
     contributors: [MSTR-14, MSTR-15]
     blocked_by: [T4.3, T4.4]
-    status: pending
-    note: "Rimossa dipendenza da T4.8 (deferred a V1)"
+    status: completed
+    evidence: ".maestro/tests/pedagogical-efficacy-report.md, .maestro/tests/pedagogical-test-specs.md, .maestro/pedagogical/review-001-t5.5-code-audit.md"
+    note: "Approved with findings. 2 medium (orphaned retention, incomplete quiz validation), 5 low. Pilot protocol designed."
 
   - id: T5.6
     subject: "Bias & safety audit (content + safeguarding)"
@@ -246,8 +253,9 @@ phase_5_testing_and_verification:
     owner: MSTR-19
     contributors: [MSTR-14]
     blocked_by: [T4.3]
-    status: pending
-    note: "Rimossa dipendenza da T4.8 (deferred a V1)"
+    status: completed
+    evidence: ".maestro/tests/bias-safety-audit-report.md"
+    note: "Overall MEDIUM risk. 3 HIGH (red color, missing gamification patterns, Italian-only wellbeing), 6 MEDIUM, 8 LOW. Safe for MVP with mitigations."
 
 phase_6_deployment:
   - id: T6.1

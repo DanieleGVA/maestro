@@ -12,7 +12,7 @@
  */
 
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import NodeCard from './NodeCard';
 import StateIndicator from './StateIndicator';
 import { MASTERY_TOKENS, type MasteryStateKey } from '../theme/tokens';
@@ -59,19 +59,18 @@ export default function MasteryMap({ macroNodes, onNodePress }: MasteryMapProps)
       </View>
 
       {/* Legend (collapsible) */}
-      <View
+      <TouchableOpacity
         accessible
         accessibilityRole="button"
         accessibilityLabel={`Legenda stati. ${legendExpanded ? 'Espansa' : 'Compressa'}`}
         accessibilityHint="Tocca due volte per espandere o comprimere la legenda"
+        onPress={() => setLegendExpanded(!legendExpanded)}
+        activeOpacity={0.7}
       >
-        <Text
-          style={styles.legendToggle}
-          onPress={() => setLegendExpanded(!legendExpanded)}
-        >
+        <Text style={styles.legendToggle}>
           {legendExpanded ? 'Nascondi legenda' : 'Mostra legenda'}
         </Text>
-      </View>
+      </TouchableOpacity>
 
       {legendExpanded && (
         <View style={styles.legend} accessible accessibilityLabel="Legenda degli stati">
@@ -92,7 +91,6 @@ export default function MasteryMap({ macroNodes, onNodePress }: MasteryMapProps)
         </View>
       ) : (
         <View
-          accessible={false}
           accessibilityRole="list"
         >
           {macroNodes.map((node) => (

@@ -3,7 +3,7 @@
 > Questo file cattura lo stato operativo del progetto e fornisce a ogni nuova sessione di Claude il contesto necessario per riprendere il lavoro. Aggiornare a ogni milestone significativa.
 
 **Ultimo aggiornamento**: 2026-05-20
-**Fase corrente**: Phase 4 COMPLETATA — Phase 5 (Testing) pronta a partire
+**Fase corrente**: Phase 5 COMPLETATA — Phase 6 (Deployment) pronta a partire
 **Task DAG**: `.maestro/tasks/task_dag.yaml`
 
 ---
@@ -135,15 +135,32 @@ DPIA, consenso e bilinguismo rimandati interamente a V1. Il pilota MVP opera sen
 
 **Task rimandati a V1**: T3.1 (DPIA+consenso), T3.4 (bilinguismo), T4.5 (F14 admin path), T4.8 (bilingual MVP)
 
-### Prossima fase: Phase 5 — Testing & Verification
+### Phase 5 — Testing & Verification (COMPLETATA)
 
-I task di Phase 5 sono (vedi task_dag.yaml):
-- T5.1: Unit + integration test suite (MSTR-14) — dipende da T4.1, T4.2, T4.3, T4.4
-- T5.2: E2E acceptance tests (MSTR-14) — dipende da T4.6, T4.7
-- T5.3: Accessibility audit (MSTR-17) — dipende da T4.6, T4.7
-- T5.4: Security pen-test (MSTR-13) — dipende da T4.7
-- T5.5: Pedagogical efficacy test (MSTR-22) — dipende da T4.3, T4.4
-- T5.6: Bias & safety audit (MSTR-19) — dipende da T4.3
+6 task completati in parallelo. Remediation applicata per tutti i finding critici e high.
+
+| Task | Deliverable | Agente | Risultato |
+|---|---|---|---|
+| T5.1 | `src/backend/tests/unit/` (22 file), `tests/integration/` (7 file), `conftest.py` | MSTR-14 | >=80% unit, >=60% integration. Tutti i moduli coperti. |
+| T5.2 | `tests/e2e/` (17 file: 6 teacher Playwright + 7 student specs + 4 infra) | MSTR-14 | 105 test cases. Teacher: Playwright. Student: executable specs. |
+| T5.3 | `.maestro/tests/accessibility-audit-report.md` + 5 fix nel codice | MSTR-17 | 1 critical + 3 high CORRETTI. Conditional WCAG 2.1 AA pass. |
+| T5.4 | `.maestro/tests/security-pentest-report.md` + 5 fix nel codice | MSTR-13 | 2 critical + 3 high CORRETTI (auth su KG/content/KMM routers, IDOR, headers, CORS, input validation). Gate MET. |
+| T5.5 | `.maestro/tests/pedagogical-efficacy-report.md` + `pedagogical-test-specs.md` | MSTR-22 | APPROVATO con 2 medium (orphaned retention, quiz validation incompleta), 5 low. Protocollo pilota disegnato. |
+| T5.6 | `.maestro/tests/bias-safety-audit-report.md` | MSTR-19 | Rischio MEDIO. 3 HIGH (colore rosso, gamification patterns mancanti, wellbeing solo italiano), 6 MEDIUM, 8 LOW. |
+
+**Remediation applicata post-audit:**
+- BSA-01: Colore lacuna da rosso (#C62828) a ambra (#FF8F00) in `src/mobile/theme/tokens.ts` e `src/dashboard/theme/tokens.ts`
+- BSA-02: 4 pattern gamification anti-pattern aggiunti a `src/backend/src/maestro/safeguarding/checker.py` (ranking, streak, countdown, variable reward)
+- F-02: Cancellazione retention schedule pendenti su regressione a lacuna in `src/backend/src/maestro/kmm/state_machine.py`
+
+### Prossima fase: Phase 6 — Deployment
+
+I task di Phase 6 sono (vedi task_dag.yaml):
+- T6.1: CI/CD + monitoring + alerting (MSTR-12) — dipende da T5.1
+- T6.2: DR plan + EU residency infrastructure (MSTR-12) — dipende da T6.1
+- T6.3: DPIA filing + Garante Privacy alignment (MSTR-16) — dipende da T5.1, T5.4, T5.6
+- T6.4: Audit trail end-to-end validation (MSTR-16) — dipende da T6.3
+- T6.5: Pilot deployment plan (MSTR-01) — dipende da T6.2, T6.4, T5.2, T5.3, T5.5
 
 ---
 

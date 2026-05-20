@@ -191,11 +191,25 @@ async def execute_transition(
         sns.last_quiz_at = now
         sns.attempt_count += 1
 
-    # Reset retention on regression to lacuna
+    # Reset retention on regression to lacuna and cancel pending checks
     if target_state == MasteryState.lacuna.value:
         sns.next_retention_check = None
         sns.retention_checks_passed = 0
         sns.attempt_count = 0
+
+        # Cancel any pending retention schedules to avoid orphaned checks (F-02)
+        cancel_stmt = (
+            select(RetentionSchedule)
+            .where(
+                RetentionSchedule.student_id == student_uuid,
+                RetentionSchedule.node_id == node_id,
+                RetentionSchedule.course_id == course_uuid,
+                RetentionSchedule.status == RetentionStatus.pending.value,
+            )
+        )
+        pending_result = await session.execute(cancel_stmt)
+        for pending_schedule in pending_result.scalars().all():
+            pending_schedule.status = RetentionStatus.cancelled.value
 
     # 4. Create transition log
     student_uuid = (

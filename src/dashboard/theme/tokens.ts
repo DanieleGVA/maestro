@@ -20,10 +20,10 @@ export const MASTERY_TOKENS = {
     label: "Introdotto",
   },
   lacuna: {
-    bg: "#C62828",
-    fg: "#FFFFFF",
-    border: "#B71C1C",
-    icon: "close",
+    bg: "#FF8F00",
+    fg: "#000000",
+    border: "#EF6C00",
+    icon: "alert-circle-outline",
     label: "Lacuna",
   },
   in_recupero: {

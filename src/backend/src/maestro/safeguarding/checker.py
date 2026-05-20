@@ -279,6 +279,48 @@ BLOCKED_PATTERNS: list[tuple[str, ViolationCategory, ViolationSeverity, str]] = 
         "con referente scolastico.",
     ),
     # -------------------------------------------------------------------
+    # GAMIFICATION ANTI-PATTERNS (Regola 5, N3, F7.7)
+    # From safeguarding-mvp-spec.md Section 6.2
+    # -------------------------------------------------------------------
+    (
+        r"(?i)(sei\s+(al\s+)?(primo|secondo|terzo|ultimo)\s+(posto|in\s+classifica)|"
+        r"classifica\s+(settimanale|giornaliera|mensile|della\s+classe)|"
+        r"posizione\s+#?\d+\s+(su|di)\s+\d+|"
+        r"top\s+\d+\s+(studenti?|della\s+classe))",
+        ViolationCategory.STUDENT_COMPARISON,
+        ViolationSeverity.BLOCK,
+        "Pattern di ranking / classifica. Nessuna classifica tra studenti.",
+    ),
+    (
+        r"(?i)(la\s+tua\s+serie\s+(positiva|di\s+vittorie)|"
+        r"streak\s+di\s+\d+\s+giorni|"
+        r"non\s+perdere\s+la\s+(tua\s+)?serie|"
+        r"mantieni\s+(la\s+)?serie|"
+        r"giorno\s+\d+\s+consecutivo)",
+        ViolationCategory.FOMO_SCARCITY,
+        ViolationSeverity.BLOCK,
+        "Pattern di streak pressure. Nessuna pressione basata su serie consecutive.",
+    ),
+    (
+        r"(?i)(tra\s+\d+\s+(minuti?|ore|secondi)|"
+        r"countdown|conto\s+alla\s+rovescia|"
+        r"timer\s+(attivo|in\s+corso)|"
+        r"tempo\s+rimasto\s*:\s*\d+)",
+        ViolationCategory.FOMO_SCARCITY,
+        ViolationSeverity.BLOCK,
+        "Pattern di countdown / timer. Nessun countdown per attivita' di apprendimento.",
+    ),
+    (
+        r"(?i)(ricompensa\s+(misteriosa|segreta|casuale|a\s+sorpresa)|"
+        r"premio\s+(misterios[oa]|segret[oa]|casuale|a\s+sorpresa)|"
+        r"scopri\s+cosa\s+(hai\s+)?vinto|"
+        r"apri\s+(il\s+)?forziere|"
+        r"ruota\s+(della\s+)?fortuna)",
+        ViolationCategory.FOMO_SCARCITY,
+        ViolationSeverity.BLOCK,
+        "Pattern di variable reward. Nessuna ricompensa a sorpresa o meccanica da slot machine.",
+    ),
+    # -------------------------------------------------------------------
     # CONTENUTO AGE-INAPPROPRIATE (Regola 3, F8.5)
     # -------------------------------------------------------------------
     (
