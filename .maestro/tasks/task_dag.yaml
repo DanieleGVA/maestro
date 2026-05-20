@@ -92,7 +92,8 @@ phase_3_compliance_and_safety:
     owner: MSTR-19
     contributors: []
     blocked_by: [T2.3]
-    status: pending
+    status: completed
+    evidence: ".maestro/safeguarding/safeguarding-mvp-spec.md"
 
   - id: T3.3
     subject: "Accessibility design system + DSA/BES protocol"
@@ -100,7 +101,8 @@ phase_3_compliance_and_safety:
     owner: MSTR-17
     contributors: []
     blocked_by: [T2.5]
-    status: pending
+    status: completed
+    evidence: ".maestro/accessibility/accessibility-mvp-spec.md"
 
   - id: T3.4
     subject: "Bilingual ops + native reviewer SLA (MVP: 2 languages)"
@@ -117,7 +119,8 @@ phase_3_compliance_and_safety:
     owner: MSTR-13
     contributors: []
     blocked_by: [T2.5]
-    status: pending
+    status: completed
+    evidence: ".maestro/security/security-mvp-spec.md"
     note: "Dipendenza da T3.1 rimossa (T3.1 deferred a V1)"
 
 phase_4_implementation:

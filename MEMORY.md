@@ -2,8 +2,8 @@
 
 > Questo file cattura lo stato operativo del progetto e fornisce a ogni nuova sessione di Claude il contesto necessario per riprendere il lavoro. Aggiornare a ogni milestone significativa.
 
-**Ultimo aggiornamento**: 2026-05-18
-**Fase corrente**: Phase 2 COMPLETATA — Phase 3 (Compliance & Safety) ridotta: solo Safeguarding + Accessibilita' + Security
+**Ultimo aggiornamento**: 2026-05-20
+**Fase corrente**: Phase 3 COMPLETATA — Phase 4 (Implementation) pronta a partire
 **Task DAG**: `.maestro/tasks/task_dag.yaml`
 
 ---
@@ -27,6 +27,18 @@
 | T2.3 Content generation | `docs/architecture/HLD-003-content-generation.md` | MSTR-06 |
 | T2.4 Data & mastery state | `docs/architecture/HLD-004-data-mastery-state.md` + `ADR-004-data-model.md` | MSTR-07 |
 | T2.5 Interface contracts | `docs/architecture/interface-contracts.md` + `docs/architecture/production-HLD.md` + `ADR-005-interface-resolution.md` | MSTR-02 |
+
+### Phase 3 — Compliance & Safety MVP (COMPLETATA)
+
+Scope ridotto per decisione Daniele: DPIA, consenso e bilinguismo rimandati a V1.
+
+| Task | Deliverable | Agente |
+|---|---|---|
+| T3.1 DPIA + consenso | RIMANDATO A V1 | MSTR-16 |
+| T3.2 Safeguarding | `.maestro/safeguarding/safeguarding-mvp-spec.md` (64KB) | MSTR-19 |
+| T3.3 Accessibilita' | `.maestro/accessibility/accessibility-mvp-spec.md` (48KB) | MSTR-17 |
+| T3.4 Bilinguismo | RIMANDATO A V1 | MSTR-18 |
+| T3.5 Security | `.maestro/security/security-mvp-spec.md` (74KB) | MSTR-13 |
 
 ---
 
@@ -87,11 +99,9 @@
 
 ---
 
-## Phase 3 — Compliance & Safety (MVP ridotto)
+## Scope MVP vs V1 (decisione Daniele)
 
-Spec: `docs/architecture/phase3-compliance-mvp.md`
-
-**Decisione Daniele**: DPIA, consenso e bilinguismo rimandati interamente a V1. MVP include solo safeguarding, accessibilita' e security.
+DPIA, consenso e bilinguismo rimandati interamente a V1. Il pilota MVP opera senza profilazione personalizzata, senza bilinguismo e con consenso gestito fuori sistema (cartaceo). Spec: `docs/architecture/phase3-compliance-mvp.md`
 
 | Area | MVP | V1 |
 |---|---|---|
@@ -104,19 +114,19 @@ Spec: `docs/architecture/phase3-compliance-mvp.md`
 | Auth | Keycloak basic + 3 ruoli + JWT + MFA admin | SSO registro elettronico, SPID |
 | Security | pgcrypto PII + TLS + pseudonimizzazione + audit | Pen-test, Vault, WAF |
 
-**Impatto su task DAG**: T3.1 (DPIA+consenso) e T3.4 (bilinguismo) rimandati a V1. T3.5 non dipende piu' da T3.1. T4.5 (F14 admin path) e T4.8 (bilingual MVP) rimandati a V1.
+**Task rimandati a V1**: T3.1 (DPIA+consenso), T3.4 (bilinguismo), T4.5 (F14 admin path), T4.8 (bilingual MVP)
 
 ### Prossima fase: Phase 4 — Implementation (MVP ridotto)
 
 I task di Phase 4 MVP sono (vedi task_dag.yaml):
-- T4.1: Backend orchestration + agent framework (MSTR-08)
-- T4.2: KG ingestion pipeline + concept mapping (MSTR-11)
-- T4.3: Content generation services (MSTR-10)
-- T4.4: Knowledge Map Manager + state store (MSTR-08)
-- T4.6: Student mobile app MVP (MSTR-09)
-- T4.7: Teacher dashboard (MSTR-09)
+- T4.1: Backend orchestration + agent framework (MSTR-08) — dipende da T2.5, T3.5
+- T4.2: KG ingestion pipeline + concept mapping (MSTR-11) — dipende da T2.2, T2.4
+- T4.3: Content generation services (MSTR-10) — dipende da T2.3, T3.2
+- T4.4: Knowledge Map Manager + state store (MSTR-08) — dipende da T2.4, T3.5
+- T4.6: Student mobile app MVP (MSTR-09) — dipende da T2.5, T3.3, T4.1
+- T4.7: Teacher dashboard (MSTR-09) — dipende da T2.5, T3.3, T4.1, T4.4
 
-Rimandati a V1: T4.5 (F14 admin path — dipende da T3.1 consenso), T4.8 (bilingual MVP — dipende da T3.4)
+Rimandati a V1: T4.5 (F14 admin path), T4.8 (bilingual MVP)
 
 ---
 
@@ -150,10 +160,16 @@ maestro/
       ADR-004-data-model.md             — Architettura dati
       ADR-005-interface-resolution.md   — Risoluzione conflitti inter-HLD
     tasks/
-      task_dag.yaml                     — DAG 32 task, 6 fasi (T1.1-T2.5 completati)
+      task_dag.yaml                     — DAG 32 task, 6 fasi (T1.1-T3.5 completati, T3.1+T3.4 deferred V1)
     schemas/
       handoff.json                      — Schema JSON per handoff inter-agente
-    dpia/                               — (vuoto — da popolare in T3.1)
+    safeguarding/
+      safeguarding-mvp-spec.md          — Spec safeguarding MVP (T3.2)
+    accessibility/
+      accessibility-mvp-spec.md         — Spec accessibilita' MVP (T3.3)
+    security/
+      security-mvp-spec.md              — Spec sicurezza MVP (T3.5)
+    dpia/                               — (vuoto — V1, T3.1 deferred)
     handoffs/                           — (vuoto — da popolare durante esecuzione)
     qa_findings/                        — (vuoto — da popolare durante review QA)
     pedagogical/                        — (vuoto — da popolare durante review pedagogico)
@@ -177,4 +193,4 @@ maestro/
 3. Per lo stato dei task: leggere `.maestro/tasks/task_dag.yaml`
 4. Per le decisioni prese: leggere gli ADR in `.maestro/decisions/`
 5. Per i requisiti: leggere `docs/MAESTRO_requisiti_v0.3.md`
-6. Per lanciare Phase 3 MVP: creare un team con gli agenti MSTR-19, MSTR-17, MSTR-13 (MSTR-16 e MSTR-18 rimandati a V1)
+6. Per lanciare Phase 4: creare un team con MSTR-08 (backend), MSTR-11 (data engineer), MSTR-10 (AI/ML), MSTR-09 (frontend). T4.1+T4.2 partono in parallelo, T4.3 dipende da T3.2, T4.4 da T3.5, T4.6 da T4.1, T4.7 da T4.1+T4.4
