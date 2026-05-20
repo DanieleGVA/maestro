@@ -19,6 +19,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U maestro_app -d maestro"]
       interval: 10s
@@ -56,11 +57,20 @@ services:
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-changeme_dev}
       KC_HOSTNAME_STRICT: "false"
       KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin_dev}
     ports:
       - "8080:8080"
-    command: start-dev
+    command: start-dev --import-realm
+    volumes:
+      - ./keycloak-realm.json:/opt/keycloak/data/import/maestro-realm.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3;grep -q '200 OK' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
     depends_on:
       postgres:
         condition: service_healthy
@@ -84,6 +94,8 @@ services:
       MAESTRO_CORS_ORIGINS: '["http://localhost:3000"]'
       MAESTRO_ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
       MAESTRO_OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      MAESTRO_PII_ENCRYPTION_KEY: "${MAESTRO_PII_ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef}"
+      MAESTRO_SEED_DEMO: "true"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
     ports:
       - "8000:8000"
@@ -91,6 +103,8 @@ services:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      keycloak:
         condition: service_healthy
     restart: unless-stopped
 

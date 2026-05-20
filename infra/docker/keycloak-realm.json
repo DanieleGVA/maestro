@@ -1,0 +1,284 @@
+{
+  "id": "maestro",
+  "realm": "maestro",
+  "displayName": "MAESTRO",
+  "displayNameHtml": "<strong>MAESTRO</strong> Learning Companion",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 10,
+  "passwordPolicy": "length(8)",
+  "accessTokenLifespan": 1800,
+  "ssoSessionIdleTimeout": 28800,
+  "ssoSessionMaxLifespan": 28800,
+  "accessTokenLifespanForImplicitFlow": 900,
+  "offlineSessionIdleTimeout": 2592000,
+  "offlineSessionMaxLifespan": 5184000,
+  "roles": {
+    "realm": [
+      {
+        "name": "student",
+        "description": "Student role - learner accessing personalised content",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "teacher",
+        "description": "Teacher role - manages classes, views dashboards, overrides mastery states",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "admin",
+        "description": "Administrator role - full system access",
+        "composite": true,
+        "clientRole": false,
+        "composites": {
+          "realm": ["teacher"]
+        }
+      }
+    ]
+  },
+  "defaultRoles": ["student"],
+  "clients": [
+    {
+      "clientId": "maestro-api",
+      "name": "MAESTRO Backend API",
+      "description": "Backend API client for service-to-service and direct access",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "protocol": "openid-connect",
+      "redirectUris": [
+        "http://localhost:8000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8000"
+      ],
+      "attributes": {
+        "access.token.lifespan": "1800",
+        "pkce.code.challenge.method": "S256"
+      },
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access"
+      ]
+    },
+    {
+      "clientId": "maestro-dashboard",
+      "name": "MAESTRO Dashboard",
+      "description": "Next.js dashboard frontend client",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "protocol": "openid-connect",
+      "redirectUris": [
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000"
+      ],
+      "attributes": {
+        "access.token.lifespan": "1800",
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:3000/*"
+      },
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin@maestro.dev",
+      "email": "admin@maestro.dev",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "MAESTRO",
+      "lastName": "Admin",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["admin"]
+    },
+    {
+      "username": "m.rossi@pantanelli.edu.it",
+      "email": "m.rossi@pantanelli.edu.it",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Marco",
+      "lastName": "Rossi",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["teacher"]
+    },
+    {
+      "username": "s.bianchi@studenti.pantanelli.edu.it",
+      "email": "s.bianchi@studenti.pantanelli.edu.it",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Sofia",
+      "lastName": "Bianchi",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["student"]
+    },
+    {
+      "username": "l.romano@studenti.pantanelli.edu.it",
+      "email": "l.romano@studenti.pantanelli.edu.it",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Luca",
+      "lastName": "Romano",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["student"]
+    },
+    {
+      "username": "g.esposito@studenti.pantanelli.edu.it",
+      "email": "g.esposito@studenti.pantanelli.edu.it",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Giulia",
+      "lastName": "Esposito",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["student"]
+    },
+    {
+      "username": "a.colombo@studenti.pantanelli.edu.it",
+      "email": "a.colombo@studenti.pantanelli.edu.it",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Alessandro",
+      "lastName": "Colombo",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["student"]
+    },
+    {
+      "username": "m.ferrari@studenti.pantanelli.edu.it",
+      "email": "m.ferrari@studenti.pantanelli.edu.it",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Martina",
+      "lastName": "Ferrari",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["student"]
+    }
+  ],
+  "scopeMappings": [
+    {
+      "client": "maestro-api",
+      "roles": ["student", "teacher", "admin"]
+    },
+    {
+      "client": "maestro-dashboard",
+      "roles": ["student", "teacher", "admin"]
+    }
+  ],
+  "clientScopeMappings": {},
+  "internationalizationEnabled": true,
+  "supportedLocales": ["it", "en"],
+  "defaultLocale": "it",
+  "eventsEnabled": true,
+  "eventsListeners": ["jboss-logging"],
+  "enabledEventTypes": [
+    "LOGIN",
+    "LOGIN_ERROR",
+    "LOGOUT",
+    "REGISTER",
+    "REGISTER_ERROR",
+    "CODE_TO_TOKEN",
+    "CODE_TO_TOKEN_ERROR",
+    "CLIENT_LOGIN",
+    "CLIENT_LOGIN_ERROR",
+    "FEDERATED_IDENTITY_LINK",
+    "REMOVE_FEDERATED_IDENTITY",
+    "UPDATE_EMAIL",
+    "UPDATE_PROFILE",
+    "RESET_PASSWORD",
+    "RESET_PASSWORD_ERROR",
+    "SEND_RESET_PASSWORD",
+    "UPDATE_TOTP",
+    "REMOVE_TOTP",
+    "GRANT_CONSENT",
+    "UPDATE_CONSENT",
+    "REVOKE_GRANT",
+    "SEND_VERIFY_EMAIL",
+    "VERIFY_EMAIL",
+    "CUSTOM_REQUIRED_ACTION",
+    "IMPERSONATE"
+  ],
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": true
+}

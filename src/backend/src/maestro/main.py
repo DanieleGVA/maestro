@@ -4,6 +4,8 @@ Registers all API routers, configures CORS, OTEL instrumentation,
 and custom error handlers for MAESTRO exceptions.
 """
 
+import logging
+import os
 import uuid
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -25,13 +27,46 @@ from maestro.common.exceptions import (
 )
 from maestro.config import settings
 
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Startup and shutdown events."""
-    # Startup: verify DB connection, warm caches
+    from maestro.db.engine import engine
+    from maestro.db.init_db import init_db
+
+    # --- Startup ---
+    logger.info("MAESTRO API starting up...")
+
+    # 1. Initialise database (extensions, schemas, migrations)
+    try:
+        await init_db()
+        logger.info("Database initialisation succeeded")
+    except Exception:
+        logger.exception("Database initialisation failed — service may be degraded")
+
+    # 2. Optionally seed demo data (dev/staging only)
+    seed_demo = os.environ.get("MAESTRO_SEED_DEMO", "false").lower() in ("true", "1", "yes")
+    if seed_demo:
+        try:
+            from maestro.db.engine import async_session_factory
+            from maestro.db.seed import seed_demo_data
+
+            async with async_session_factory() as session:
+                await seed_demo_data(session)
+            logger.info("Demo data seeded successfully")
+        except Exception:
+            logger.exception("Demo data seeding failed — continuing without seed data")
+
+    logger.info("MAESTRO API ready to serve requests")
+
     yield
-    # Shutdown: close pools
+
+    # --- Shutdown ---
+    logger.info("MAESTRO API shutting down...")
+    await engine.dispose()
+    logger.info("Database engine disposed")
 
 
 app = FastAPI(
