@@ -1,0 +1,163 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Active Connections",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "pg_stat_activity_count{datname=\"maestro\"}",
+          "legendFormat": "Active"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "pg_settings_max_connections",
+          "legendFormat": "Max"
+        }
+      ]
+    },
+    {
+      "title": "Connection Pool Usage (%)",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "100 * pg_stat_activity_count{datname=\"maestro\"} / pg_settings_max_connections"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 60 },
+              { "color": "orange", "value": 80 },
+              { "color": "red", "value": 90 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Database Size",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "pg_database_size_bytes{datname=\"maestro\"}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Transactions/s",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "rate(pg_stat_database_xact_commit{datname=\"maestro\"}[5m])",
+          "legendFormat": "Commits/s"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "rate(pg_stat_database_xact_rollback{datname=\"maestro\"}[5m])",
+          "legendFormat": "Rollbacks/s"
+        }
+      ]
+    },
+    {
+      "title": "Cache Hit Ratio (%)",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "100 * pg_stat_database_blks_hit{datname=\"maestro\"} / (pg_stat_database_blks_hit{datname=\"maestro\"} + pg_stat_database_blks_read{datname=\"maestro\"})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 90 },
+              { "color": "green", "value": 99 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Disk Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "node_filesystem_avail_bytes{mountpoint=\"/\"}",
+          "legendFormat": "Available"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "node_filesystem_size_bytes{mountpoint=\"/\"}",
+          "legendFormat": "Total"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "WAL Lag (bytes)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "pg_replication_lag",
+          "legendFormat": "WAL Lag"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["maestro", "database", "postgresql"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "title": "MAESTRO - Database Performance",
+  "uid": "maestro-database"
+}

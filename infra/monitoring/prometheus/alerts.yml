@@ -1,0 +1,234 @@
+# MAESTRO Alerting Rules
+# Deployed via Mimir ruler or Prometheus alertmanager.
+# All thresholds aligned with N2 (99.5% availability during school hours)
+# and N4 (performance SLAs).
+
+groups:
+  # -------------------------------------------------------------------------
+  # API Health
+  # -------------------------------------------------------------------------
+  - name: maestro.api
+    rules:
+      - alert: HighErrorRate
+        expr: >
+          100 * sum(rate(http_server_request_duration_seconds_count{
+            service_namespace="maestro",
+            http_status_code=~"5.."
+          }[5m]))
+          /
+          sum(rate(http_server_request_duration_seconds_count{
+            service_namespace="maestro"
+          }[5m]))
+          > 5
+        for: 5m
+        labels:
+          severity: critical
+          team: devops
+        annotations:
+          summary: "API error rate above 5% for 5 minutes"
+          description: >
+            The 5xx error rate is {{ $value | printf "%.1f" }}%.
+            This exceeds the 5% threshold and may impact student experience.
+          runbook: "docs/operations/runbook-api-errors.md"
+
+      - alert: HighP95Latency
+        expr: >
+          histogram_quantile(0.95,
+            sum(rate(http_server_request_duration_seconds_bucket{
+              service_namespace="maestro"
+            }[5m])) by (le)
+          ) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "API P95 latency above 2 seconds"
+          description: >
+            P95 latency is {{ $value | printf "%.2f" }}s.
+            N4 target for chat is 3s, but 2s is the early-warning threshold.
+          runbook: "docs/operations/runbook-latency.md"
+
+      - alert: ServiceDown
+        expr: up{job="maestro-backend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: devops
+        annotations:
+          summary: "MAESTRO backend is down"
+          description: "The backend service has been unreachable for 2 minutes."
+          runbook: "docs/operations/runbook-service-down.md"
+
+  # -------------------------------------------------------------------------
+  # LLM Cost Monitoring (R9)
+  # -------------------------------------------------------------------------
+  - name: maestro.llm
+    rules:
+      - alert: LLMMonthlyBudgetWarning
+        expr: >
+          sum(increase(maestro_llm_cost_euros_total[30d])) > 320
+        for: 1h
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "LLM monthly cost at 80% of EUR 400 budget"
+          description: >
+            Current 30-day LLM spend is EUR {{ $value | printf "%.0f" }}.
+            Budget is EUR 400/month (R9). Consider increasing cache hit rates
+            or shifting more tasks to GPT-4o-mini.
+          runbook: "docs/operations/runbook-llm-costs.md"
+
+      - alert: LLMMonthlyBudgetCritical
+        expr: >
+          sum(increase(maestro_llm_cost_euros_total[30d])) > 400
+        for: 30m
+        labels:
+          severity: critical
+          team: devops
+        annotations:
+          summary: "LLM monthly cost exceeds EUR 400 budget"
+          description: >
+            Current 30-day LLM spend is EUR {{ $value | printf "%.0f" }}.
+            Budget limit exceeded. Throttling may be required.
+          runbook: "docs/operations/runbook-llm-costs.md"
+
+      - alert: LLMHighLatency
+        expr: >
+          histogram_quantile(0.95,
+            sum(rate(maestro_llm_request_duration_seconds_bucket[5m])) by (le, channel)
+          ) > 60
+        for: 5m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "LLM generation P95 latency exceeds 60s on channel {{ $labels.channel }}"
+          description: >
+            P95 latency for {{ $labels.channel }} is {{ $value | printf "%.1f" }}s.
+            N4 target for review_doc is 60s, remediation is 30s, quiz is 15s, chat is 3s.
+
+  # -------------------------------------------------------------------------
+  # Safeguarding (N3 -- immediate for critical)
+  # -------------------------------------------------------------------------
+  - name: maestro.safeguarding
+    rules:
+      - alert: SafeguardingCriticalAlert
+        expr: >
+          increase(maestro_safeguarding_alerts_total{severity="critical"}[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          team: safeguarding
+        annotations:
+          summary: "Critical safeguarding alert triggered"
+          description: >
+            A critical safeguarding alert was raised. This requires immediate
+            human review per the MAESTRO safeguarding policy.
+            All students in MAESTRO are minors (13-19).
+          runbook: "docs/operations/runbook-safeguarding.md"
+
+      - alert: SafeguardingHighFrequency
+        expr: >
+          sum(rate(maestro_safeguarding_alerts_total[1h])) > 5
+        for: 10m
+        labels:
+          severity: warning
+          team: safeguarding
+        annotations:
+          summary: "Unusually high safeguarding alert rate"
+          description: >
+            More than 5 safeguarding alerts per hour for 10 minutes.
+            This may indicate a systematic content generation issue.
+
+  # -------------------------------------------------------------------------
+  # Database
+  # -------------------------------------------------------------------------
+  - name: maestro.database
+    rules:
+      - alert: DatabaseConnectionPoolExhaustion
+        expr: >
+          pg_stat_activity_count{datname="maestro"}
+          / pg_settings_max_connections > 0.85
+        for: 5m
+        labels:
+          severity: critical
+          team: devops
+        annotations:
+          summary: "PostgreSQL connection pool at 85% capacity"
+          description: >
+            Active connections: {{ $value | printf "%.0f" }}% of max.
+            Risk of connection exhaustion if load continues.
+          runbook: "docs/operations/runbook-database.md"
+
+      - alert: DatabaseReplicationLag
+        expr: pg_replication_lag > 10485760
+        for: 5m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "PostgreSQL WAL replication lag exceeds 10MB"
+          description: >
+            WAL lag is {{ $value | humanize1024 }}B.
+            This may impact RPO compliance (N2: RPO <=24h).
+
+  # -------------------------------------------------------------------------
+  # Infrastructure
+  # -------------------------------------------------------------------------
+  - name: maestro.infrastructure
+    rules:
+      - alert: DiskUsageHigh
+        expr: >
+          100 * (1 - node_filesystem_avail_bytes{mountpoint="/"}
+          / node_filesystem_size_bytes{mountpoint="/"}) > 85
+        for: 10m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "Disk usage above 85%"
+          description: >
+            Disk usage is {{ $value | printf "%.1f" }}%.
+            Consider cleaning old Docker images or extending storage.
+          runbook: "docs/operations/runbook-disk.md"
+
+      - alert: DiskUsageCritical
+        expr: >
+          100 * (1 - node_filesystem_avail_bytes{mountpoint="/"}
+          / node_filesystem_size_bytes{mountpoint="/"}) > 95
+        for: 5m
+        labels:
+          severity: critical
+          team: devops
+        annotations:
+          summary: "Disk usage above 95% -- immediate action required"
+          description: >
+            Disk usage is {{ $value | printf "%.1f" }}%.
+            System stability at risk.
+
+      - alert: HighMemoryUsage
+        expr: >
+          100 * (1 - node_memory_MemAvailable_bytes
+          / node_memory_MemTotal_bytes) > 90
+        for: 10m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "Memory usage above 90%"
+          description: >
+            Memory usage is {{ $value | printf "%.1f" }}%.
+
+      - alert: HighCPUUsage
+        expr: >
+          100 * (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m]))) > 85
+        for: 10m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "CPU usage above 85%"
+          description: >
+            Average CPU usage is {{ $value | printf "%.1f" }}%.

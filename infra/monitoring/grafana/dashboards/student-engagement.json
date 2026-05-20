@@ -1,0 +1,109 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Active Students (Last 1h)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "count(sum by (student_pseudo_id)(increase(maestro_student_actions_total[1h]) > 0))"
+        }
+      ]
+    },
+    {
+      "title": "Quiz Completions (24h)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(increase(maestro_quiz_completions_total[24h]))"
+        }
+      ]
+    },
+    {
+      "title": "Content Views (24h)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(increase(maestro_content_views_total[24h]))"
+        }
+      ]
+    },
+    {
+      "title": "State Transitions by Type",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(rate(maestro_kmm_transitions_total[1h])) by (new_state)",
+          "legendFormat": "{{ new_state }}"
+        }
+      ]
+    },
+    {
+      "title": "Knowledge Map State Distribution",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(maestro_kmm_current_states) by (state)",
+          "legendFormat": "{{ state }}"
+        }
+      ]
+    },
+    {
+      "title": "Quiz Scores Distribution",
+      "type": "histogram",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(increase(maestro_quiz_score_bucket[24h])) by (le)",
+          "legendFormat": "{{ le }}",
+          "format": "heatmap"
+        }
+      ]
+    },
+    {
+      "title": "Session Duration (P50 / P95)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "histogram_quantile(0.5, sum(rate(maestro_session_duration_seconds_bucket[1h])) by (le))",
+          "legendFormat": "P50"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "histogram_quantile(0.95, sum(rate(maestro_session_duration_seconds_bucket[1h])) by (le))",
+          "legendFormat": "P95"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["maestro", "students", "engagement"],
+  "templating": { "list": [] },
+  "time": { "from": "now-24h", "to": "now" },
+  "title": "MAESTRO - Student Engagement",
+  "uid": "maestro-student-engagement"
+}

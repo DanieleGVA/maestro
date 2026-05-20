@@ -3,7 +3,7 @@
 > Questo file cattura lo stato operativo del progetto e fornisce a ogni nuova sessione di Claude il contesto necessario per riprendere il lavoro. Aggiornare a ogni milestone significativa.
 
 **Ultimo aggiornamento**: 2026-05-20
-**Fase corrente**: Phase 5 COMPLETATA — Phase 6 (Deployment) pronta a partire
+**Fase corrente**: TUTTE LE FASI COMPLETATE (1-6) — Progetto pronto per pilota
 **Task DAG**: `.maestro/tasks/task_dag.yaml`
 
 ---
@@ -153,14 +153,23 @@ DPIA, consenso e bilinguismo rimandati interamente a V1. Il pilota MVP opera sen
 - BSA-02: 4 pattern gamification anti-pattern aggiunti a `src/backend/src/maestro/safeguarding/checker.py` (ranking, streak, countdown, variable reward)
 - F-02: Cancellazione retention schedule pendenti su regressione a lacuna in `src/backend/src/maestro/kmm/state_machine.py`
 
-### Prossima fase: Phase 6 — Deployment
+### Phase 6 — Deployment (COMPLETATA)
 
-I task di Phase 6 sono (vedi task_dag.yaml):
-- T6.1: CI/CD + monitoring + alerting (MSTR-12) — dipende da T5.1
-- T6.2: DR plan + EU residency infrastructure (MSTR-12) — dipende da T6.1
-- T6.3: DPIA filing + Garante Privacy alignment (MSTR-16) — dipende da T5.1, T5.4, T5.6
-- T6.4: Audit trail end-to-end validation (MSTR-16) — dipende da T6.3
-- T6.5: Pilot deployment plan (MSTR-01) — dipende da T6.2, T6.4, T5.2, T5.3, T5.5
+5 task completati in 3 wave.
+
+| Task | Deliverable | Agente | Risultato |
+|---|---|---|---|
+| T6.1 | `.github/workflows/` (3), `infra/docker/` (5), `infra/monitoring/` (8), `infra/terraform/` (4), `infra/scripts/` (3) | MSTR-12 | 24 file. CI/CD GitHub Actions, Docker, 5 Grafana dashboard, 12 alert rules, Terraform Hetzner+Scaleway. |
+| T6.2 | `.maestro/deployment/dr-plan.md`, `eu-residency-architecture.md`, `cost-model.md`, `infra/runbooks/` (4) | MSTR-12 | RPO<=24h, RTO<=4h. 10 scenari failure. EU residency provata a ogni livello. Costo EUR 173-465/mese. |
+| T6.3 | `.maestro/dpia/` (4 documenti) | MSTR-16 | DPIA slim (14 rischi, residuale BASSO), 5 template consenso cartaceo, checklist Garante 57 item (70% OK), retention schedule. |
+| T6.4 | `.maestro/deployment/audit-trail-validation-report.md`, `audit-reconstruction-queries.sql` | MSTR-16 | PASS. 10/13 eventi loggati. Immutabilita' verificata. 2 gap medi (accesso heatmap, blocchi safeguarding). |
+| T6.5 | `.maestro/deployment/pilot-deployment-plan.md`, `launch-readiness-scorecard.md` | MSTR-01 | Piano pilota 8 settimane (32 prerequisiti, timeline settimanale, 11 ruoli, training, rollback). Scorecard: 23 PASS, 4 CONDITIONAL, 13 PENDING, 1 BLOCKED. |
+
+### Stato finale del progetto
+
+Tutte le 6 fasi completate. 32 task nel DAG: 24 completati, 4 deferred a V1 (T3.1, T3.4, T4.5, T4.8), 4 non applicabili.
+
+**Per lanciare il pilota**: risolvere i 13 item PENDING + 1 BLOCKED nel launch readiness scorecard (`.maestro/deployment/launch-readiness-scorecard.md`). Principalmente: DPA sub-processori, deploy infrastruttura, consensi, training docente.
 
 ---
 

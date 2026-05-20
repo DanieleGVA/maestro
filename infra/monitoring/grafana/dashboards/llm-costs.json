@@ -1,0 +1,220 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Total Token Consumption (24h)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(increase(maestro_llm_tokens_total[24h]))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 500000 },
+              { "color": "red", "value": 1000000 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Estimated Daily Cost (EUR)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(increase(maestro_llm_cost_euros_total[24h]))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyEUR",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 12 },
+              { "color": "red", "value": 17 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Monthly Budget Usage (%)",
+      "type": "gauge",
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "100 * sum(increase(maestro_llm_cost_euros_total[30d])) / 400"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 60 },
+              { "color": "orange", "value": 80 },
+              { "color": "red", "value": 95 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Tokens by Agent",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(rate(maestro_llm_tokens_total[5m])) by (agent)",
+          "legendFormat": "{{ agent }}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Tokens by Model",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(increase(maestro_llm_tokens_total[24h])) by (model)",
+          "legendFormat": "{{ model }}"
+        }
+      ]
+    },
+    {
+      "title": "Cost per Student per Day (EUR)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(rate(maestro_llm_cost_euros_total[24h])) by (student_pseudo_id)",
+          "legendFormat": "{{ student_pseudo_id }}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyEUR"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Generation Latency P95 by Channel",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "histogram_quantile(0.95, sum(rate(maestro_llm_request_duration_seconds_bucket[5m])) by (le, channel))",
+          "legendFormat": "{{ channel }}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 15 },
+              { "color": "orange", "value": 30 },
+              { "color": "red", "value": 60 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Cache Hit Rate (%)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 12, "x": 0, "y": 20 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "100 * sum(rate(maestro_llm_cache_hits_total[5m])) / (sum(rate(maestro_llm_cache_hits_total[5m])) + sum(rate(maestro_llm_cache_misses_total[5m])))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 30 },
+              { "color": "green", "value": 50 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "LLM Error Rate",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 12, "x": 12, "y": 20 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(rate(maestro_llm_errors_total[5m]))",
+          "legendFormat": "Errors/s"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.1 },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["maestro", "llm", "cost"],
+  "templating": { "list": [] },
+  "time": { "from": "now-24h", "to": "now" },
+  "title": "MAESTRO - LLM Token Consumption & Costs",
+  "uid": "maestro-llm-costs"
+}

@@ -1,0 +1,53 @@
+# MAESTRO Dashboard — Multi-stage Next.js build
+# EU compliance: this image runs on Hetzner DE/FI servers only.
+
+# ---------------------------------------------------------------------------
+# Stage 1: Install dependencies
+# ---------------------------------------------------------------------------
+FROM node:20.18-slim AS deps
+
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci --ignore-scripts
+
+# ---------------------------------------------------------------------------
+# Stage 2: Build
+# ---------------------------------------------------------------------------
+FROM node:20.18-slim AS builder
+
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build
+
+# ---------------------------------------------------------------------------
+# Stage 3: Production
+# ---------------------------------------------------------------------------
+FROM node:20.18-slim AS production
+
+# Security: run as non-root
+RUN groupadd -r maestro && useradd -r -g maestro -d /app -s /sbin/nologin maestro
+
+WORKDIR /app
+
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=3000
+
+# Copy only production artifacts
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+RUN chown -R maestro:maestro /app
+
+USER maestro
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:3000/ || exit 1
+
+CMD ["node", "server.js"]

@@ -1,0 +1,91 @@
+# MAESTRO OpenTelemetry Collector Configuration
+# Receives traces, metrics, and logs from the backend (FastAPI/LangGraph).
+# Routes to Grafana stack: Tempo (traces), Mimir (metrics), Loki (logs).
+# Runs on Hetzner EU infrastructure -- no telemetry leaves EU boundaries.
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+
+  # Scrape Prometheus metrics from backend /metrics endpoint
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: "maestro-backend"
+          scrape_interval: 15s
+          static_configs:
+            - targets: ["backend:8000"]
+          metrics_path: "/metrics"
+
+processors:
+  batch:
+    send_batch_size: 1024
+    timeout: 5s
+
+  # Memory limiter to prevent OOM
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 768
+    spike_limit_mib: 256
+
+  # Add resource attributes for all telemetry
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: "${DEPLOYMENT_ENV:-staging}"
+        action: upsert
+      - key: service.namespace
+        value: "maestro"
+        action: upsert
+
+  # Filter out health check noise from traces
+  filter/traces:
+    traces:
+      span:
+        - 'attributes["http.target"] == "/api/v1/health"'
+
+exporters:
+  # Traces -> Tempo
+  otlp/tempo:
+    endpoint: "tempo:4317"
+    tls:
+      insecure: true
+
+  # Metrics -> Mimir (Prometheus remote write)
+  prometheusremotewrite/mimir:
+    endpoint: "http://mimir:9009/api/v1/push"
+    tls:
+      insecure: true
+
+  # Logs -> Loki
+  loki:
+    endpoint: "http://loki:3100/loki/api/v1/push"
+
+  # Debug logging (development only)
+  debug:
+    verbosity: basic
+
+service:
+  telemetry:
+    metrics:
+      address: "0.0.0.0:8888"
+
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, filter/traces, batch, resource]
+      exporters: [otlp/tempo]
+
+    metrics:
+      receivers: [otlp, prometheus]
+      processors: [memory_limiter, batch, resource]
+      exporters: [prometheusremotewrite/mimir]
+
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [loki]

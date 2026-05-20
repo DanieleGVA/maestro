@@ -3,3 +3,30 @@ __pycache__/
 node_modules/
 .expo/
 .next/
+
+# Terraform
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.backup
+infra/terraform/*.tfplan
+infra/terraform/.terraform.lock.hcl
+
+# Docker
+*.tar
+
+# Environment files (secrets)
+.env
+.env.*
+!.env.example
+
+# Coverage
+coverage-*.xml
+junit-*.xml
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

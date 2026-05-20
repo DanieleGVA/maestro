@@ -1,0 +1,59 @@
+# MAESTRO Backend — Multi-stage Python build
+# Base image pinned to specific digest for reproducibility.
+# EU compliance: this image runs on Hetzner DE/FI servers only.
+
+# ---------------------------------------------------------------------------
+# Stage 1: Build dependencies
+# ---------------------------------------------------------------------------
+FROM python:3.12.8-slim-bookworm AS builder
+
+WORKDIR /build
+
+# Install build tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy only dependency files first for layer caching
+COPY pyproject.toml ./
+RUN pip install --no-cache-dir --prefix=/install .
+
+# ---------------------------------------------------------------------------
+# Stage 2: Production image
+# ---------------------------------------------------------------------------
+FROM python:3.12.8-slim-bookworm AS production
+
+# Security: run as non-root
+RUN groupadd -r maestro && useradd -r -g maestro -d /app -s /sbin/nologin maestro
+
+# Runtime dependencies only
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libpq5 curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy installed packages from builder
+COPY --from=builder /install /usr/local
+
+# Copy application code
+WORKDIR /app
+COPY src/maestro/ /app/src/maestro/
+COPY alembic/ /app/alembic/
+
+# Set ownership
+RUN chown -R maestro:maestro /app
+
+USER maestro
+
+# OpenTelemetry environment defaults
+ENV OTEL_SERVICE_NAME="maestro-backend" \
+    OTEL_EXPORTER_OTLP_ENDPOINT="http://otel-collector:4317" \
+    OTEL_EXPORTER_OTLP_PROTOCOL="grpc" \
+    PYTHONPATH="/app" \
+    PYTHONUNBUFFERED="1"
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8000/api/v1/health || exit 1
+
+CMD ["uvicorn", "maestro.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]

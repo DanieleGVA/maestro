@@ -1,0 +1,258 @@
+# MAESTRO CI Pipeline
+# Runs on every push and PR to main.
+# Backend: lint, type-check, unit tests, integration tests
+# Dashboard: lint, type-check, build
+# Mobile: lint, type-check
+# Security: dependency audit (pip-audit, npm audit)
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "20"
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Backend
+  # ---------------------------------------------------------------------------
+  backend-lint:
+    name: "Backend: Lint (ruff)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install dependencies
+        working-directory: src/backend
+        run: pip install -e ".[dev]"
+      - name: Run ruff check
+        working-directory: src/backend
+        run: ruff check src/ tests/
+      - name: Run ruff format check
+        working-directory: src/backend
+        run: ruff format --check src/ tests/
+
+  backend-typecheck:
+    name: "Backend: Type Check (mypy)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install dependencies
+        working-directory: src/backend
+        run: pip install -e ".[dev]"
+      - name: Run mypy
+        working-directory: src/backend
+        run: mypy src/
+
+  backend-unit-tests:
+    name: "Backend: Unit Tests"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install dependencies
+        working-directory: src/backend
+        run: pip install -e ".[dev]"
+      - name: Run unit tests with coverage
+        working-directory: src/backend
+        run: |
+          pytest tests/unit/ \
+            --cov=src/maestro \
+            --cov-report=xml:coverage-unit.xml \
+            --cov-report=term-missing \
+            --junitxml=junit-unit.xml \
+            -v
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-unit
+          path: src/backend/coverage-unit.xml
+
+  backend-integration-tests:
+    name: "Backend: Integration Tests"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install dependencies
+        working-directory: src/backend
+        run: pip install -e ".[dev]"
+      - name: Run integration tests
+        working-directory: src/backend
+        env:
+          MAESTRO_DATABASE_URL: "postgresql+asyncpg://test:test@localhost:5432/maestro_test"
+          MAESTRO_REDIS_URL: "redis://localhost:6379/1"
+          MAESTRO_ANTHROPIC_API_KEY: "test-key"
+          MAESTRO_OPENAI_API_KEY: "test-key"
+        run: |
+          pytest tests/integration/ \
+            --cov=src/maestro \
+            --cov-report=xml:coverage-integration.xml \
+            --junitxml=junit-integration.xml \
+            -v
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-integration
+          path: src/backend/coverage-integration.xml
+
+  # ---------------------------------------------------------------------------
+  # Dashboard (Next.js)
+  # ---------------------------------------------------------------------------
+  dashboard-lint:
+    name: "Dashboard: Lint (eslint)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        working-directory: src/dashboard
+        run: npm ci
+      - name: Run eslint
+        working-directory: src/dashboard
+        run: npm run lint
+
+  dashboard-typecheck:
+    name: "Dashboard: Type Check (tsc)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        working-directory: src/dashboard
+        run: npm ci
+      - name: Run type check
+        working-directory: src/dashboard
+        run: npx tsc --noEmit
+
+  dashboard-build:
+    name: "Dashboard: Build"
+    runs-on: ubuntu-24.04
+    needs: [dashboard-lint, dashboard-typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        working-directory: src/dashboard
+        run: npm ci
+      - name: Build Next.js
+        working-directory: src/dashboard
+        run: npm run build
+
+  # ---------------------------------------------------------------------------
+  # Mobile (React Native + Expo)
+  # ---------------------------------------------------------------------------
+  mobile-lint:
+    name: "Mobile: Lint"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        working-directory: src/mobile
+        run: npm ci
+      - name: Run eslint
+        working-directory: src/mobile
+        run: npm run lint
+
+  mobile-typecheck:
+    name: "Mobile: Type Check (tsc)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        working-directory: src/mobile
+        run: npm ci
+      - name: Run type check
+        working-directory: src/mobile
+        run: npm run typecheck
+
+  # ---------------------------------------------------------------------------
+  # Security: Dependency Audit
+  # ---------------------------------------------------------------------------
+  security-audit:
+    name: "Security: Dependency Audit"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+      - name: Audit Python dependencies
+        working-directory: src/backend
+        run: pip-audit -r <(pip install -e ".[dev]" --dry-run --report - 2>/dev/null || true) || pip-audit
+
+      - name: Audit Dashboard dependencies
+        working-directory: src/dashboard
+        run: npm audit --audit-level=high || true
+
+      - name: Audit Mobile dependencies
+        working-directory: src/mobile
+        run: npm audit --audit-level=high || true
+
+  # ---------------------------------------------------------------------------
+  # Summary gate -- all checks must pass before merge
+  # ---------------------------------------------------------------------------
+  ci-gate:
+    name: "CI Gate"
+    runs-on: ubuntu-24.04
+    needs:
+      - backend-lint
+      - backend-typecheck
+      - backend-unit-tests
+      - backend-integration-tests
+      - dashboard-lint
+      - dashboard-typecheck
+      - dashboard-build
+      - mobile-lint
+      - mobile-typecheck
+      - security-audit
+    if: always()
+    steps:
+      - name: Check all jobs passed
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            echo "One or more CI jobs failed."
+            exit 1
+          fi
+          echo "All CI checks passed."

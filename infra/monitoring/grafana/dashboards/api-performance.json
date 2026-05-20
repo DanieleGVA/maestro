@@ -1,0 +1,128 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Request Rate (req/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(rate(http_server_request_duration_seconds_count{service_namespace=\"maestro\"}[5m]))",
+          "legendFormat": "Total"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "API Error Rate (%)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "100 * sum(rate(http_server_request_duration_seconds_count{service_namespace=\"maestro\",http_status_code=~\"5..\"}[5m])) / sum(rate(http_server_request_duration_seconds_count{service_namespace=\"maestro\"}[5m]))",
+          "legendFormat": "5xx Error Rate"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 2 },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "P95 Latency by Endpoint",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "histogram_quantile(0.95, sum(rate(http_server_request_duration_seconds_bucket{service_namespace=\"maestro\"}[5m])) by (le, http_route))",
+          "legendFormat": "{{ http_route }}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 2 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Request Duration Heatmap",
+      "type": "heatmap",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(increase(http_server_request_duration_seconds_bucket{service_namespace=\"maestro\"}[5m])) by (le)",
+          "legendFormat": "{{ le }}",
+          "format": "heatmap"
+        }
+      ]
+    },
+    {
+      "title": "Active Connections",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(http_server_active_requests{service_namespace=\"maestro\"})"
+        }
+      ]
+    },
+    {
+      "title": "Uptime",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 16 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "time() - process_start_time_seconds{service_namespace=\"maestro\"}",
+          "legendFormat": "Uptime"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["maestro", "api", "performance"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "title": "MAESTRO - API Performance",
+  "uid": "maestro-api-performance"
+}

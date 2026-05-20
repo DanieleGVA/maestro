@@ -1,0 +1,116 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Safeguarding Alerts (24h)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(increase(maestro_safeguarding_alerts_total[24h]))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 5 },
+              { "color": "red", "value": 20 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Critical Alerts (24h)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(increase(maestro_safeguarding_alerts_total{severity=\"critical\"}[24h]))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Content Blocked (24h)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(increase(maestro_safeguarding_content_blocked_total[24h]))"
+        }
+      ]
+    },
+    {
+      "title": "Alerts by Category",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(rate(maestro_safeguarding_alerts_total[1h])) by (category)",
+          "legendFormat": "{{ category }}"
+        }
+      ]
+    },
+    {
+      "title": "Alerts by Severity",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "sum(increase(maestro_safeguarding_alerts_total[24h])) by (severity)",
+          "legendFormat": "{{ severity }}"
+        }
+      ]
+    },
+    {
+      "title": "Safeguarding Check Latency (P95)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Mimir" },
+          "expr": "histogram_quantile(0.95, sum(rate(maestro_safeguarding_check_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "P95"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["maestro", "safeguarding", "safety"],
+  "templating": { "list": [] },
+  "time": { "from": "now-24h", "to": "now" },
+  "title": "MAESTRO - Safeguarding Alerts",
+  "uid": "maestro-safeguarding"
+}

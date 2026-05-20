@@ -1,0 +1,17 @@
+node_modules
+.next
+.expo
+__pycache__
+*.pyc
+.pytest_cache
+.git
+.github
+.maestro
+docs
+template
+tests
+*.md
+.env
+.env.*
+coverage-*.xml
+junit-*.xml

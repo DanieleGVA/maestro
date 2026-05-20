@@ -264,7 +264,9 @@ phase_6_deployment:
     owner: MSTR-12
     contributors: []
     blocked_by: [T5.1]
-    status: pending
+    status: completed
+    evidence: ".github/workflows/ (3 workflows), infra/docker/ (5 files), infra/monitoring/ (8 files), infra/terraform/ (4 files), infra/scripts/ (3 files)"
+    note: "24 files. GitHub Actions CI/CD, Docker multi-stage, Grafana dashboards (5), Prometheus alerts (12 rules), Terraform Hetzner+Scaleway, operational scripts."
 
   - id: T6.2
     subject: "DR plan + EU residency infrastructure"
@@ -272,7 +274,9 @@ phase_6_deployment:
     owner: MSTR-12
     contributors: []
     blocked_by: [T6.1]
-    status: pending
+    status: completed
+    evidence: ".maestro/deployment/dr-plan.md, .maestro/deployment/eu-residency-architecture.md, .maestro/deployment/cost-model.md, infra/runbooks/ (4 files)"
+    note: "RPO<=24h, RTO<=4h. 10 failure scenarios. EU residency proven at all layers. Cost EUR 173-465/month. 4 runbooks."
 
   - id: T6.3
     subject: "DPIA filing + Garante Privacy alignment"
@@ -280,7 +284,9 @@ phase_6_deployment:
     owner: MSTR-16
     contributors: []
     blocked_by: [T5.1, T5.4, T5.6]
-    status: pending
+    status: completed
+    evidence: ".maestro/dpia/dpia-mvp-slim.md, .maestro/dpia/consent-templates-mvp.md, .maestro/dpia/garante-alignment-checklist.md, .maestro/dpia/data-retention-schedule.md"
+    note: "DPIA slim (14 risks, residual LOW), 5 consent templates (paper MVP), 57-item Garante checklist (70% OK), retention schedule. 5 open questions for Director/Human."
 
   - id: T6.4
     subject: "Audit trail end-to-end validation"
@@ -288,7 +294,9 @@ phase_6_deployment:
     owner: MSTR-16
     contributors: []
     blocked_by: [T6.3]
-    status: pending
+    status: completed
+    evidence: ".maestro/deployment/audit-trail-validation-report.md, .maestro/deployment/audit-reconstruction-queries.sql"
+    note: "PASS. 10/13 journey events logged. Immutability verified. 2 medium gaps (heatmap access, safeguarding blocks). 12 SQL reconstruction queries."
 
   - id: T6.5
     subject: "Pilot deployment plan (1 school, 1 class)"
@@ -296,4 +304,6 @@ phase_6_deployment:
     owner: MSTR-01
     contributors: []
     blocked_by: [T6.2, T6.4, T5.2, T5.3, T5.5]
-    status: pending
+    status: completed
+    evidence: ".maestro/deployment/pilot-deployment-plan.md, .maestro/deployment/launch-readiness-scorecard.md"
+    note: "8-week pilot plan (32-item checklist, week-by-week timeline, 11 roles, training plan, rollback). Scorecard: 23 PASS, 4 CONDITIONAL, 13 PENDING, 1 BLOCKED."
