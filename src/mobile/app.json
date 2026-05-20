@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "MAESTRO",
+    "slug": "maestro-student",
+    "version": "0.1.0",
+    "orientation": "default",
+    "scheme": "maestro",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "it.maestro.student"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "it.maestro.student"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font"
+    ]
+  }
+}

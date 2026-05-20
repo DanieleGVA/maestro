@@ -130,7 +130,8 @@ phase_4_implementation:
     owner: MSTR-08
     contributors: []
     blocked_by: [T2.5, T3.5]
-    status: pending
+    status: completed
+    evidence: "src/backend/src/maestro/{orchestrator,agents,api,auth,common,db/models/core.py,db/models/audit.py,main.py}"
 
   - id: T4.2
     subject: "KG ingestion pipeline + concept mapping"
@@ -138,7 +139,8 @@ phase_4_implementation:
     owner: MSTR-11
     contributors: []
     blocked_by: [T2.2, T2.4]
-    status: pending
+    status: completed
+    evidence: "src/backend/src/maestro/kg/"
 
   - id: T4.3
     subject: "Content generation services (text + minimal podcast)"
@@ -146,7 +148,8 @@ phase_4_implementation:
     owner: MSTR-10
     contributors: []
     blocked_by: [T2.3, T3.2]
-    status: pending
+    status: completed
+    evidence: "src/backend/src/maestro/{content,llm,safeguarding}/"
 
   - id: T4.4
     subject: "Knowledge Map Manager + state store + audit log"
@@ -154,7 +157,8 @@ phase_4_implementation:
     owner: MSTR-08
     contributors: []
     blocked_by: [T2.4, T3.5]
-    status: pending
+    status: completed
+    evidence: "src/backend/src/maestro/kmm/"
 
   - id: T4.5
     subject: "F14 admin path (anagrafica + consenso + iscrizione)"
@@ -171,7 +175,8 @@ phase_4_implementation:
     owner: MSTR-09
     contributors: []
     blocked_by: [T2.5, T3.3, T4.1]
-    status: pending
+    status: completed
+    evidence: "src/mobile/"
 
   - id: T4.7
     subject: "Teacher dashboard"
@@ -179,7 +184,8 @@ phase_4_implementation:
     owner: MSTR-09
     contributors: [MSTR-08]
     blocked_by: [T2.5, T3.3, T4.1, T4.4]
-    status: pending
+    status: completed
+    evidence: "src/dashboard/"
 
   - id: T4.8
     subject: "Bilingual MVP (2 languages)"

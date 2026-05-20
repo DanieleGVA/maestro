@@ -3,7 +3,7 @@
 > Questo file cattura lo stato operativo del progetto e fornisce a ogni nuova sessione di Claude il contesto necessario per riprendere il lavoro. Aggiornare a ogni milestone significativa.
 
 **Ultimo aggiornamento**: 2026-05-20
-**Fase corrente**: Phase 3 COMPLETATA — Phase 4 (Implementation) pronta a partire
+**Fase corrente**: Phase 4 COMPLETATA — Phase 5 (Testing) pronta a partire
 **Task DAG**: `.maestro/tasks/task_dag.yaml`
 
 ---
@@ -39,6 +39,25 @@ Scope ridotto per decisione Daniele: DPIA, consenso e bilinguismo rimandati a V1
 | T3.3 Accessibilita' | `.maestro/accessibility/accessibility-mvp-spec.md` (48KB) | MSTR-17 |
 | T3.4 Bilinguismo | RIMANDATO A V1 | MSTR-18 |
 | T3.5 Security | `.maestro/security/security-mvp-spec.md` (74KB) | MSTR-13 |
+
+### Phase 4 — Implementation MVP (COMPLETATA)
+
+140 file, ~17.800 LOC totali. Backend Python + Mobile React Native + Dashboard Next.js.
+
+| Task | Deliverable | Agente | Stats |
+|---|---|---|---|
+| T4.1 Backend orchestrator | `src/backend/src/maestro/{orchestrator,agents,api,auth,common,db/models}` | MSTR-08 | LangGraph StateGraph, FastAPI, Keycloak JWT, RBAC, 6 API routers |
+| T4.2 KG ingestion | `src/backend/src/maestro/kg/` | MSTR-11 | Apache AGE dual-write, pgvector embeddings, concept mapper, curriculum |
+| T4.3 Content generation | `src/backend/src/maestro/{content,llm,safeguarding}/` | MSTR-10 | LLM Gateway + pseudonimizzazione, Text Agent, Quiz Engine, safeguarding checker |
+| T4.4 KMM state store | `src/backend/src/maestro/kmm/` | MSTR-08 | 6-state machine, transitions, heatmap worst-state rollup, retention D+7 |
+| T4.5 F14 admin path | RIMANDATO A V1 | -- | Dipende da T3.1 |
+| T4.6 Student mobile app | `src/mobile/` (25 file TS/TSX) | MSTR-09 | Expo Router, mappa padronanza, quiz, missioni, accessibilita' |
+| T4.7 Teacher dashboard | `src/dashboard/` (33 file TS/TSX) | MSTR-09 | Next.js App Router, heatmap classe, override docente, upload lezione, alert wellbeing |
+| T4.8 Bilingual MVP | RIMANDATO A V1 | -- | Dipende da T3.4 |
+
+Backend: 68 file Python, ~9.300 LOC, 11 unit test files.
+Mobile: 25 file TS/TSX, ~3.800 LOC.
+Dashboard: 33 file TS/TSX, ~2.200 LOC.
 
 ---
 
@@ -116,17 +135,15 @@ DPIA, consenso e bilinguismo rimandati interamente a V1. Il pilota MVP opera sen
 
 **Task rimandati a V1**: T3.1 (DPIA+consenso), T3.4 (bilinguismo), T4.5 (F14 admin path), T4.8 (bilingual MVP)
 
-### Prossima fase: Phase 4 — Implementation (MVP ridotto)
+### Prossima fase: Phase 5 — Testing & Verification
 
-I task di Phase 4 MVP sono (vedi task_dag.yaml):
-- T4.1: Backend orchestration + agent framework (MSTR-08) — dipende da T2.5, T3.5
-- T4.2: KG ingestion pipeline + concept mapping (MSTR-11) — dipende da T2.2, T2.4
-- T4.3: Content generation services (MSTR-10) — dipende da T2.3, T3.2
-- T4.4: Knowledge Map Manager + state store (MSTR-08) — dipende da T2.4, T3.5
-- T4.6: Student mobile app MVP (MSTR-09) — dipende da T2.5, T3.3, T4.1
-- T4.7: Teacher dashboard (MSTR-09) — dipende da T2.5, T3.3, T4.1, T4.4
-
-Rimandati a V1: T4.5 (F14 admin path), T4.8 (bilingual MVP)
+I task di Phase 5 sono (vedi task_dag.yaml):
+- T5.1: Unit + integration test suite (MSTR-14) — dipende da T4.1, T4.2, T4.3, T4.4
+- T5.2: E2E acceptance tests (MSTR-14) — dipende da T4.6, T4.7
+- T5.3: Accessibility audit (MSTR-17) — dipende da T4.6, T4.7
+- T5.4: Security pen-test (MSTR-13) — dipende da T4.7
+- T5.5: Pedagogical efficacy test (MSTR-22) — dipende da T4.3, T4.4
+- T5.6: Bias & safety audit (MSTR-19) — dipende da T4.3
 
 ---
 
@@ -160,7 +177,7 @@ maestro/
       ADR-004-data-model.md             — Architettura dati
       ADR-005-interface-resolution.md   — Risoluzione conflitti inter-HLD
     tasks/
-      task_dag.yaml                     — DAG 32 task, 6 fasi (T1.1-T3.5 completati, T3.1+T3.4 deferred V1)
+      task_dag.yaml                     — DAG 32 task, 6 fasi (T1.1-T4.7 completati, T3.1+T3.4+T4.5+T4.8 deferred V1)
     schemas/
       handoff.json                      — Schema JSON per handoff inter-agente
     safeguarding/
@@ -179,8 +196,35 @@ maestro/
     agents/                             — 23 prompt file per agenti MSTR-01..23
     settings.json                       — Configurazione Claude Code
 
-  src/                                  — (vuoto — codice da Phase 4)
-  tests/                                — (vuoto — test da Phase 5)
+  src/
+    backend/                            — Python backend (FastAPI + LangGraph), 68 file, ~9.3K LOC
+      pyproject.toml                    — Dipendenze Python
+      src/maestro/
+        main.py                         — FastAPI app entry point
+        config.py                       — pydantic-settings config
+        orchestrator/                   — LangGraph StateGraph + checkpointer (T4.1)
+        agents/                         — Agent nodes: diagnostic, content_selector, profiler (T4.1)
+        api/v1/                         — 6 FastAPI routers (T4.1)
+        auth/                           — Keycloak JWT + RBAC middleware (T4.1)
+        db/models/                      — SQLAlchemy ORM (core, audit) (T4.1)
+        kg/                             — KG ingestion, embeddings, concept mapper, AGE ops (T4.2)
+        content/                        — Text Agent, Quiz Engine, cache (T4.3)
+        llm/                            — LLM Gateway + pseudonymizer (T4.3)
+        safeguarding/                   — Checker, retry, alerts (T4.3)
+        kmm/                            — State machine, heatmap, retention (T4.4)
+        common/                         — Audit, exceptions, schemas (T4.1)
+      tests/unit/                       — 11 test files
+    mobile/                             — React Native + Expo student app, 25 file, ~3.8K LOC (T4.6)
+      app/                              — Expo Router pages (login, home, map, quiz, missions, profile)
+      components/                       — MasteryMap, NodeCard, QuizView, StateIndicator
+      hooks/                            — useAuth, useApi, useStudentState
+      theme/                            — Tokens colore, typography, spacing
+    dashboard/                          — Next.js teacher dashboard, 33 file, ~2.2K LOC (T4.7)
+      app/                              — App Router pages (home, classes, heatmap, students, lessons, alerts)
+      components/                       — ClassHeatmap, OverrideModal, StudentMap, Sidebar
+      hooks/                            — useAuth, useApi
+      theme/                            — Tokens colore
+  tests/                                — (vuoto — test E2E da Phase 5)
   infra/                                — (vuoto — IaC da Phase 6)
 ```
 
@@ -193,4 +237,4 @@ maestro/
 3. Per lo stato dei task: leggere `.maestro/tasks/task_dag.yaml`
 4. Per le decisioni prese: leggere gli ADR in `.maestro/decisions/`
 5. Per i requisiti: leggere `docs/MAESTRO_requisiti_v0.3.md`
-6. Per lanciare Phase 4: creare un team con MSTR-08 (backend), MSTR-11 (data engineer), MSTR-10 (AI/ML), MSTR-09 (frontend). T4.1+T4.2 partono in parallelo, T4.3 dipende da T3.2, T4.4 da T3.5, T4.6 da T4.1, T4.7 da T4.1+T4.4
+6. Per lanciare Phase 5: creare un team con MSTR-14 (test), MSTR-17 (accessibility), MSTR-13 (security), MSTR-22 (pedagogical), MSTR-19 (bias). T5.1+T5.5+T5.6 partono in parallelo, T5.2+T5.3 dopo T4.6/T4.7, T5.4 dopo T4.7
