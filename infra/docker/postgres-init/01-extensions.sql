@@ -2,7 +2,7 @@
 -- Runs automatically on first container start (via docker-entrypoint-initdb.d)
 --
 -- Enable required PostgreSQL extensions
-CREATE EXTENSION IF NOT EXISTS pgvector;
+CREATE EXTENSION IF NOT EXISTS vector;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- Note: Apache AGE requires a custom PostgreSQL image or manual install.
 -- For MVP dev, we use pgvector for embeddings and skip AGE (use standard SQL for graph queries).

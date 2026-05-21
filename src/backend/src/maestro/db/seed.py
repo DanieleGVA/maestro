@@ -64,7 +64,7 @@ KG_NODE_LABELS = [
 ]
 
 KG_NODE_IDS = [
-    uuid.UUID(f"50000000-0000-0000-0000-00000000000{chr(ord('a') + i)}")
+    uuid.UUID(f"50000000-0000-0000-0000-00000000000{i}")
     for i in range(10)
 ]
 

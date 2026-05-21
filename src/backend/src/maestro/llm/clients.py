@@ -27,7 +27,10 @@ class AnthropicClient:
     """Wrapper for Anthropic API (Claude models)."""
 
     def __init__(self) -> None:
-        self._client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+        # Allow startup without keys; calls will fail at runtime if missing.
+        self._client = anthropic.AsyncAnthropic(
+            api_key=settings.anthropic_api_key or "sk-not-configured"
+        )
 
     async def generate(
         self,
@@ -61,7 +64,10 @@ class OpenAIClient:
     """Wrapper for OpenAI API (GPT models)."""
 
     def __init__(self) -> None:
-        self._client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+        # Allow startup without keys; calls will fail at runtime if missing.
+        self._client = openai.AsyncOpenAI(
+            api_key=settings.openai_api_key or "sk-not-configured"
+        )
 
     async def generate(
         self,

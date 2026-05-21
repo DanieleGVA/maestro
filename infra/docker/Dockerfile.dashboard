@@ -8,7 +8,7 @@ FROM node:20.18-slim AS deps
 
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci --ignore-scripts
+RUN if [ -f package-lock.json ]; then npm ci --ignore-scripts; else npm install --ignore-scripts; fi
 
 # ---------------------------------------------------------------------------
 # Stage 2: Build
@@ -37,9 +37,10 @@ ENV NODE_ENV=production \
     PORT=3000
 
 # Copy only production artifacts
-COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+# Public dir may be empty but must exist
+COPY --from=builder /app/public ./public
 
 RUN chown -R maestro:maestro /app
 
@@ -48,6 +49,6 @@ USER maestro
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:3000/ || exit 1
+    CMD node -e "const http=require('http');http.get('http://localhost:3000/',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"
 
 CMD ["node", "server.js"]

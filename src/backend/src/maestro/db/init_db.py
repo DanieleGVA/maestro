@@ -6,6 +6,7 @@ extensions and schemas. Fully idempotent: safe to call on every startup.
 
 from __future__ import annotations
 
+import concurrent.futures
 import logging
 import os
 from pathlib import Path
@@ -19,9 +20,11 @@ from maestro.db.engine import engine
 
 logger = logging.getLogger(__name__)
 
-# Resolve paths relative to the backend root (where alembic.ini lives)
-_BACKEND_ROOT = Path(__file__).resolve().parents[4]  # src/backend/
-_ALEMBIC_INI = _BACKEND_ROOT / "alembic.ini"
+# Resolve paths: try CWD first (Docker /app), then source-relative
+_CWD_INI = Path.cwd() / "alembic.ini"
+_SRC_INI = Path(__file__).resolve().parents[3] / "alembic.ini"
+_ALEMBIC_INI = _CWD_INI if _CWD_INI.exists() else _SRC_INI
+_BACKEND_ROOT = _ALEMBIC_INI.parent
 
 
 def _get_alembic_config() -> Config:
@@ -51,20 +54,21 @@ async def _ensure_schemas(eng: AsyncEngine) -> None:
 
 
 def _run_alembic_upgrade() -> None:
-    """Run ``alembic upgrade head`` synchronously.
+    """Run ``alembic upgrade head`` in a worker thread.
 
-    Alembic's command API is synchronous. The async engine in env.py
-    handles the actual connection internally via asyncio.run().
+    env.py calls asyncio.run(), which cannot nest inside FastAPI's event loop.
+    Running in a separate thread gives Alembic its own event loop.
     """
     cfg = _get_alembic_config()
 
-    # Ensure the database URL is propagated from settings
     from maestro.config import settings
 
     cfg.set_main_option("sqlalchemy.url", settings.database_url)
 
     logger.info("Running Alembic migrations (upgrade head)...")
-    command.upgrade(cfg, "head")
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(command.upgrade, cfg, "head")
+        future.result()  # re-raises any exception from the thread
     logger.info("Alembic migrations completed")
 
 
