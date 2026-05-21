@@ -1,27 +1,30 @@
 "use client";
 
+import { Suspense, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { useState } from "react";
 import { useCourseNodes, useStudentMap, useTeacherOverride } from "@/hooks/useApi";
 import StudentMap from "@/components/students/StudentMap";
 import OverrideModal from "@/components/students/OverrideModal";
 import HeatmapLegend from "@/components/heatmap/HeatmapLegend";
+import Alert from "@/components/common/Alert";
 import type { MasteryState } from "@/theme/tokens";
-import { MASTERY_TOKENS } from "@/theme/tokens";
 
 /**
- * Student detail page: full mastery map with override capability.
+ * Student detail page content: full mastery map with override capability.
  */
-export default function StudentDetailPage() {
+function StudentDetailContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const studentId = params.studentId as string;
   const classId = params.classId as string;
-  const courseId = searchParams.get("courseId") ?? "";
+  // In MVP, classId = courseId. Fall back to query param for backwards compat.
+  const courseId = searchParams.get("courseId") ?? classId;
   const highlightNodeId = searchParams.get("nodeId");
 
-  const { data: studentMap, isLoading: mapLoading } = useStudentMap(studentId, courseId);
-  const { data: kgNodes, isLoading: nodesLoading } = useCourseNodes(courseId);
+  const { data: studentMap, isLoading: mapLoading, isError: mapError, refetch: refetchMap } =
+    useStudentMap(studentId, courseId);
+  const { data: kgNodes, isLoading: nodesLoading, isError: nodesError, refetch: refetchNodes } =
+    useCourseNodes(courseId);
 
   const [overrideNode, setOverrideNode] = useState<{
     nodeId: string;
@@ -36,6 +39,12 @@ export default function StudentDetailPage() {
   );
 
   const isLoading = mapLoading || nodesLoading;
+  const isError = mapError || nodesError;
+
+  const handleRetry = () => {
+    refetchMap();
+    refetchNodes();
+  };
 
   const handleNodeClick = (nodeId: string) => {
     if (!studentMap || !kgNodes) return;
@@ -71,7 +80,7 @@ export default function StudentDetailPage() {
           <li aria-hidden="true">/</li>
           <li>
             <a
-              href={`/classes/${classId}?courseId=${courseId}`}
+              href={`/classes/${classId}`}
               className="hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus"
             >
               Heatmap classe
@@ -91,11 +100,27 @@ export default function StudentDetailPage() {
         <HeatmapLegend />
       </div>
 
-      {isLoading ? (
+      {isLoading && (
         <p className="mt-4 text-sm text-surface-fg" role="status" aria-live="polite">
           Caricamento mappa padronanza...
         </p>
-      ) : studentMap && kgNodes ? (
+      )}
+
+      {isError && !isLoading && (
+        <div className="mt-4">
+          <Alert variant="error">
+            Errore nel caricamento dei dati.
+          </Alert>
+          <button
+            onClick={handleRetry}
+            className="mt-3 rounded-md bg-focus px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            Riprova
+          </button>
+        </div>
+      )}
+
+      {!isLoading && !isError && studentMap && kgNodes ? (
         <div className="mt-4">
           <h2 className="mb-3 text-lg font-semibold text-page-fg">Mappa padronanza</h2>
           <p className="mb-4 text-sm text-surface-fg">
@@ -108,7 +133,9 @@ export default function StudentDetailPage() {
           />
         </div>
       ) : (
-        <p className="mt-4 text-sm text-surface-fg">Nessun dato disponibile.</p>
+        !isLoading && !isError && (
+          <p className="mt-4 text-sm text-surface-fg">Nessun dato disponibile.</p>
+        )
       )}
 
       {overrideNode && (
@@ -123,5 +150,19 @@ export default function StudentDetailPage() {
         />
       )}
     </>
+  );
+}
+
+export default function StudentDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <p className="text-sm text-surface-fg" role="status" aria-live="polite">
+          Caricamento...
+        </p>
+      }
+    >
+      <StudentDetailContent />
+    </Suspense>
   );
 }

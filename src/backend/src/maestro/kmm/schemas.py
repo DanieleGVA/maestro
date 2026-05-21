@@ -88,6 +88,30 @@ class RetentionCheckResponse(BaseModel):
     status: str
 
 
+class StudentNodeBrief(BaseModel):
+    """Minimal node state for a student in the class-students view."""
+
+    node_id: str
+    label: str
+    current_state: str
+
+
+class ClassStudentOut(BaseModel):
+    """A student row in the class-students-with-mastery endpoint."""
+
+    student_id: str
+    display_name: str
+    nodes: list[StudentNodeBrief]
+
+
+class ClassStudentsResponse(BaseModel):
+    """Per-student mastery data for a class."""
+
+    course_id: str
+    students: list[ClassStudentOut]
+    total: int
+
+
 # ---------------------------------------------------------------------------
 # Request models
 # ---------------------------------------------------------------------------

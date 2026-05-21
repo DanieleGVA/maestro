@@ -134,3 +134,31 @@ export interface UserClaims {
     roles: string[];
   };
 }
+
+/** Teacher course returned by GET /api/v1/teachers/me/courses. */
+export interface TeacherCourse {
+  id: string;
+  name: string;
+  subject: string;
+  class_name: string;
+  student_count: number;
+  year: string;
+}
+
+/** Per-student mastery row from GET /api/v1/kmm/classes/{classId}/students. */
+export interface ClassStudentRow {
+  student_id: string;
+  display_name: string;
+  states: Record<string, MasteryState>;
+}
+
+/** Safeguarding alert from GET /api/v1/safeguarding/alerts. */
+export interface SafeguardingAlert {
+  id: string;
+  student_pseudo_id: string;
+  severity: "high" | "medium" | "low";
+  phrase: string;
+  context: string;
+  timestamp: string;
+  read: boolean;
+}

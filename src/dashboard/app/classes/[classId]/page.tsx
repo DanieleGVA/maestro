@@ -1,37 +1,53 @@
 "use client";
 
-import { useParams, useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
-import { useClassHeatmap, useCourseNodes } from "@/hooks/useApi";
+import { useParams, useRouter } from "next/navigation";
+import { useClassHeatmap, useClassStudents, useCourseNodes } from "@/hooks/useApi";
 import ClassHeatmap from "@/components/heatmap/ClassHeatmap";
 import HeatmapLegend from "@/components/heatmap/HeatmapLegend";
+import Alert from "@/components/common/Alert";
 import type { StudentHeatmapRow } from "@/types";
 import type { MasteryState } from "@/theme/tokens";
 
 /**
  * Class detail page: heatmap view.
  * Per SCR-DOC-08, accessibility-mvp-spec.md Section 5.1.6.
+ *
+ * In the MVP, classId and courseId are the same value.
+ * The page fetches per-student mastery rows when available,
+ * falling back to the aggregate heatmap summary.
  */
 export default function ClassDetailPage() {
   const params = useParams();
-  const searchParams = useSearchParams();
   const router = useRouter();
   const classId = params.classId as string;
-  const courseId = searchParams.get("courseId") ?? "";
+  // In MVP, classId = courseId (one course per class in seed data)
+  const courseId = classId;
 
-  const { data: heatmapData, isLoading: heatmapLoading } = useClassHeatmap(classId, courseId);
-  const { data: kgNodes, isLoading: nodesLoading } = useCourseNodes(courseId);
+  const { data: heatmapData, isLoading: heatmapLoading, isError: heatmapError, refetch: refetchHeatmap } =
+    useClassHeatmap(classId, courseId);
+  const { data: kgNodes, isLoading: nodesLoading, isError: nodesError, refetch: refetchNodes } =
+    useCourseNodes(courseId);
+  const { data: classStudentsRaw, isLoading: studentsLoading, isError: studentsError, refetch: refetchStudents } =
+    useClassStudents(classId, courseId);
 
-  const isLoading = heatmapLoading || nodesLoading;
+  const isLoading = heatmapLoading || nodesLoading || studentsLoading;
+  const isError = heatmapError || nodesError || studentsError;
+
+  const handleRetry = () => {
+    refetchHeatmap();
+    refetchNodes();
+    refetchStudents();
+  };
 
   // Transform heatmap data into rows for the grid view
-  // MVP: generate student rows from heatmap node summaries
-  // In production, a dedicated endpoint would return per-student-per-node states
   const macroNodes = (kgNodes ?? []).filter((n) => n.node_type === "macro");
 
-  // MVP placeholder: derive student list from API data or use placeholder
-  const students: StudentHeatmapRow[] = [];
-  // When real data is available, populate from a per-student endpoint
+  // Map API response to StudentHeatmapRow format
+  const students: StudentHeatmapRow[] = (classStudentsRaw ?? []).map((row) => ({
+    student_id: row.student_id,
+    display_name: row.display_name,
+    states: row.states as Record<string, MasteryState>,
+  }));
 
   const handleCellClick = (studentId: string, nodeId: string) => {
     router.push(`/classes/${classId}/students/${studentId}?courseId=${courseId}&nodeId=${nodeId}`);
@@ -55,11 +71,27 @@ export default function ClassDetailPage() {
 
       <h1 className="text-2xl font-bold text-page-fg">Padronanza della classe</h1>
 
-      {isLoading ? (
+      {isLoading && (
         <p className="mt-4 text-sm text-surface-fg" role="status" aria-live="polite">
           Caricamento in corso...
         </p>
-      ) : (
+      )}
+
+      {isError && !isLoading && (
+        <div className="mt-4">
+          <Alert variant="error">
+            Errore nel caricamento dei dati.
+          </Alert>
+          <button
+            onClick={handleRetry}
+            className="mt-3 rounded-md bg-focus px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            Riprova
+          </button>
+        </div>
+      )}
+
+      {!isLoading && !isError && (
         <>
           <div className="mt-4">
             <HeatmapLegend />
@@ -77,7 +109,7 @@ export default function ClassDetailPage() {
             <div className="mt-6">
               {/* Fallback: aggregate view from the existing heatmap API */}
               <h2 className="mb-3 text-lg font-semibold text-page-fg">Riepilogo per concetto</h2>
-              {heatmapData && (
+              {heatmapData ? (
                 <div className="overflow-x-auto">
                   <table aria-label="Riepilogo padronanza per concetto" className="w-full border-collapse text-sm">
                     <caption className="sr-only">
@@ -116,6 +148,8 @@ export default function ClassDetailPage() {
                     </tbody>
                   </table>
                 </div>
+              ) : (
+                <p className="text-sm text-surface-fg">Nessun dato disponibile.</p>
               )}
             </div>
           )}

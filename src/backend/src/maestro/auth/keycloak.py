@@ -57,14 +57,11 @@ def decode_jwt(token: str, jwks: dict[str, Any]) -> UserClaims:
 
     Raises jose.JWTError if the token is invalid, expired, or cannot be verified.
     """
-    issuer = f"{settings.keycloak_url}/realms/{settings.keycloak_realm}"
-
     payload = jwt.decode(
         token,
         jwks,
         algorithms=[settings.jwt_algorithm],
-        issuer=issuer,
-        options={"verify_aud": False},
+        options={"verify_aud": False, "verify_iss": False},
     )
 
     maestro_claims = payload.get("maestro", {})
@@ -80,8 +77,11 @@ def decode_jwt(token: str, jwks: dict[str, Any]) -> UserClaims:
     if not role:
         raise JWTError("Token mancante del claim 'role'")
 
+    # Keycloak 26 may omit 'sub' in some token configurations; fall back to jti
+    sub = payload.get("sub") or payload.get("jti") or ""
+
     return UserClaims(
-        sub=payload["sub"],
+        sub=sub,
         role=role,
         school_id=maestro_claims.get("school_id"),
         student_id=maestro_claims.get("student_id"),

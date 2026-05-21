@@ -1,21 +1,33 @@
 "use client";
 
-import { useState } from "react";
-import { useIngestLesson, useConfirmMapping } from "@/hooks/useApi";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useIngestLesson, useConfirmMapping, useTeacherCourses } from "@/hooks/useApi";
 import LessonUpload from "@/components/lessons/LessonUpload";
 import ConceptMappingReview from "@/components/lessons/ConceptMappingReview";
 import Alert from "@/components/common/Alert";
 import type { CandidateMapping, LessonIngestRequest } from "@/types";
 
+/** Seed course ID used as default when no courseId is provided. */
+const DEFAULT_COURSE_ID = "30000000-0000-0000-0000-000000000001";
+
 /**
- * Lesson upload page.
- * Flow: upload text -> show concept mapping candidates -> confirm/reject.
+ * Lesson upload page content.
+ * Flow: select course (or use default) -> upload text -> show concept mapping candidates -> confirm/reject.
  * POST to /api/v1/kg/courses/{courseId}/lessons/ingest.
  */
-export default function LessonUploadPage() {
-  // MVP: single course
-  const courseId = "course-1";
-  const ingestMutation = useIngestLesson(courseId);
+function LessonUploadContent() {
+  const searchParams = useSearchParams();
+  const courseIdParam = searchParams.get("courseId");
+
+  // Fetch available courses so teacher can select one
+  const { data: courses, isLoading: coursesLoading } = useTeacherCourses();
+
+  const [selectedCourseId, setSelectedCourseId] = useState(
+    courseIdParam ?? DEFAULT_COURSE_ID,
+  );
+
+  const ingestMutation = useIngestLesson(selectedCourseId);
   const confirmMutation = useConfirmMapping();
 
   const [candidates, setCandidates] = useState<CandidateMapping[]>([]);
@@ -70,6 +82,37 @@ export default function LessonUploadPage() {
 
       <h1 className="text-2xl font-bold text-page-fg">Carica nuova lezione</h1>
 
+      {/* Course selector */}
+      {!uploadSuccess && (
+        <div className="mt-4">
+          <label htmlFor="course-select" className="mb-1 block text-sm font-medium text-page-fg">
+            Corso
+          </label>
+          {coursesLoading ? (
+            <p className="text-sm text-surface-fg" role="status" aria-live="polite">
+              Caricamento corsi...
+            </p>
+          ) : courses && courses.length > 0 ? (
+            <select
+              id="course-select"
+              value={selectedCourseId}
+              onChange={(e) => setSelectedCourseId(e.target.value)}
+              className="w-full max-w-md rounded-md border border-border-input px-3 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus"
+            >
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.class_name || c.name} - {c.subject}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p className="text-sm text-surface-fg">
+              Nessun corso disponibile. Viene utilizzato il corso predefinito.
+            </p>
+          )}
+        </div>
+      )}
+
       {ingestMutation.isError && (
         <div className="mt-4">
           <Alert variant="error">
@@ -98,5 +141,19 @@ export default function LessonUploadPage() {
         )}
       </div>
     </>
+  );
+}
+
+export default function LessonUploadPage() {
+  return (
+    <Suspense
+      fallback={
+        <p className="text-sm text-surface-fg" role="status" aria-live="polite">
+          Caricamento...
+        </p>
+      }
+    >
+      <LessonUploadContent />
+    </Suspense>
   );
 }

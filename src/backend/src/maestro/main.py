@@ -156,16 +156,22 @@ from maestro.api.v1.lessons import router as lessons_router
 from maestro.api.v1.sessions import router as sessions_router
 from maestro.api.v1.quizzes import router as quizzes_router
 from maestro.api.v1.classes import router as classes_router
+from maestro.api.v1.teachers import router as teachers_router
+from maestro.auth.router import router as auth_router
 from maestro.kg.router import router as kg_router
 from maestro.kmm.router import router as kmm_router
 from maestro.content.router import router as content_router
+from maestro.safeguarding.router import router as safeguarding_router
 
 app.include_router(health_router)
+app.include_router(auth_router, prefix="/api/v1")
 app.include_router(students_router, prefix="/api/v1")
 app.include_router(lessons_router, prefix="/api/v1")
 app.include_router(sessions_router, prefix="/api/v1")
 app.include_router(quizzes_router, prefix="/api/v1")
 app.include_router(classes_router, prefix="/api/v1")
+app.include_router(teachers_router, prefix="/api/v1")
 app.include_router(kg_router)
 app.include_router(kmm_router, prefix="/api/v1")
 app.include_router(content_router)
+app.include_router(safeguarding_router, prefix="/api/v1")

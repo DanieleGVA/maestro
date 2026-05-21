@@ -1,14 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import type { AxiosError } from "axios";
+import type { ApiError } from "@/types";
 
 /**
  * Teacher login page.
  * Keyboard flow: Tab -> username -> password -> submit (accessibility-mvp-spec.md Section 5.1.1).
+ * After successful login, redirects to the originally requested URL (from middleware redirect param).
  */
-export default function LoginPage() {
+function LoginContent() {
   const { login } = useAuth();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") ?? "/";
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,8 +28,19 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(username, password);
-    } catch {
-      setError("Credenziali non valide. Riprova.");
+    } catch (err: unknown) {
+      const axiosErr = err as AxiosError<ApiError>;
+      if (axiosErr?.response?.data?.error?.message) {
+        setError(axiosErr.response.data.error.message);
+      } else if (axiosErr?.response?.status === 401) {
+        setError("Credenziali non valide. Controlla nome utente e password.");
+      } else if (axiosErr?.response?.status === 429) {
+        setError("Troppi tentativi di accesso. Riprova tra qualche minuto.");
+      } else if (axiosErr?.message === "Network Error" || !axiosErr?.response) {
+        setError("Impossibile contattare il server. Verifica la connessione.");
+      } else {
+        setError("Errore durante l'accesso. Riprova.");
+      }
     } finally {
       setLoading(false);
     }
@@ -95,5 +113,19 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-surface-bg">
+          <p className="text-sm text-surface-fg">Caricamento...</p>
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }

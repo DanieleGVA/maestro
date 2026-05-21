@@ -29,7 +29,10 @@ export function useAuth() {
       setTokens(res.data.access_token, res.data.refresh_token);
       const u = getUserFromToken();
       setUser(u);
-      router.push("/");
+      // Redirect to the originally requested page, or home
+      const params = new URLSearchParams(window.location.search);
+      const redirectTo = params.get("redirect") ?? "/";
+      router.push(redirectTo);
     },
     [router],
   );

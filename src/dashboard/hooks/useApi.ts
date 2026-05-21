@@ -11,7 +11,52 @@ import type {
   StudentMapResponse,
   TransitionLog,
   TransitionRequest,
+  TeacherCourse,
+  ClassStudentRow,
+  SafeguardingAlert,
 } from "@/types";
+
+/** Fetch teacher's courses (used as class list). */
+export function useTeacherCourses() {
+  return useQuery({
+    queryKey: ["teacherCourses"],
+    queryFn: async () => {
+      const res = await api.get<TeacherCourse[]>("/api/v1/teachers/me/courses");
+      // The API may return the array directly or wrapped in { data: [...] }
+      const data = Array.isArray(res.data) ? res.data : (res.data as unknown as ApiResponse<TeacherCourse[]>).data;
+      return data;
+    },
+  });
+}
+
+/** Fetch per-student mastery rows for a class. */
+export function useClassStudents(classId: string, courseId?: string) {
+  const effectiveCourseId = courseId ?? classId;
+  return useQuery({
+    queryKey: ["classStudents", classId, effectiveCourseId],
+    queryFn: async () => {
+      const res = await api.get<ClassStudentRow[]>(
+        `/api/v1/kmm/classes/${classId}/students`,
+        { params: { course_id: effectiveCourseId } },
+      );
+      const data = Array.isArray(res.data) ? res.data : (res.data as unknown as ApiResponse<ClassStudentRow[]>).data;
+      return data;
+    },
+    enabled: !!classId,
+  });
+}
+
+/** Fetch safeguarding / wellbeing alerts. */
+export function useAlerts() {
+  return useQuery({
+    queryKey: ["safeguardingAlerts"],
+    queryFn: async () => {
+      const res = await api.get<SafeguardingAlert[]>("/api/v1/safeguarding/alerts");
+      const data = Array.isArray(res.data) ? res.data : (res.data as unknown as ApiResponse<SafeguardingAlert[]>).data;
+      return data;
+    },
+  });
+}
 
 /** Fetch class heatmap. */
 export function useClassHeatmap(classId: string, courseId: string) {

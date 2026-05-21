@@ -5,6 +5,7 @@ Endpoints (mounted at /api/v1 by main.py):
   GET  /kmm/students/{id}/nodes/{nid}   -- single node state
   POST /kmm/students/{id}/nodes/{nid}/transition -- teacher override
   GET  /kmm/classes/{class_id}/heatmap  -- class heatmap
+  GET  /kmm/classes/{class_id}/students -- per-student mastery for class
   GET  /kmm/students/{id}/retention/due -- due retention checks
 """
 
@@ -12,8 +13,8 @@ from __future__ import annotations
 
 import uuid as _uuid
 
-from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from maestro.auth.dependencies import get_current_user, get_db
@@ -191,6 +192,91 @@ async def read_class_heatmap(
             )
             for ns in heatmap.node_summaries
         ],
+    )
+
+
+@router.get(
+    "/classes/{class_id}/students",
+    response_model=schemas.ClassStudentsResponse,
+)
+async def read_class_students(
+    class_id: str,
+    course_id: str = Query(..., description="Course UUID"),
+    user: UserClaims = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> schemas.ClassStudentsResponse:
+    """Per-student mastery data for a class (teacher dashboard heatmap).
+
+    Returns each enrolled student with pseudonymised display name and
+    per-node mastery state.  No PII is returned -- students are labelled
+    "Studente 1", "Studente 2", etc.
+    """
+    if user.role not in ("teacher", "admin"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo docenti e admin possono accedere ai dati della classe",
+        )
+
+    # 1. Get enrolled students for this course (class_id is not used directly
+    #    in the DB model -- courses *are* classes in MAESTRO MVP).
+    stmt_students = select(Enrolment.student_id).where(
+        Enrolment.course_id == _uuid.UUID(course_id),
+        Enrolment.status == "active",
+    ).order_by(Enrolment.student_id)
+    result = await session.execute(stmt_students)
+    student_ids = [str(sid) for sid in result.scalars().all()]
+
+    if not student_ids:
+        return schemas.ClassStudentsResponse(
+            course_id=course_id, students=[], total=0,
+        )
+
+    # 2. Fetch all node states + node labels in a single query
+    rows = await session.execute(
+        text("""
+            SELECT
+                sns.student_id,
+                sns.node_id,
+                sns.current_state,
+                COALESCE(n.label_it, sns.node_id) AS label
+            FROM kmm.student_node_state sns
+            LEFT JOIN kg.node n ON n.id::text = sns.node_id
+            WHERE sns.course_id = :course_id
+              AND sns.student_id::text = ANY(:student_ids)
+            ORDER BY sns.student_id, n.sort_order, sns.node_id
+        """),
+        {"course_id": course_id, "student_ids": student_ids},
+    )
+    all_rows = rows.all()
+
+    # 3. Group by student
+    from collections import defaultdict
+    student_nodes: dict[str, list[schemas.StudentNodeBrief]] = defaultdict(list)
+    for row in all_rows:
+        sid = str(row.student_id)
+        student_nodes[sid].append(
+            schemas.StudentNodeBrief(
+                node_id=row.node_id,
+                label=row.label,
+                current_state=row.current_state,
+            )
+        )
+
+    # 4. Build response with pseudonymised display names
+    students_out = []
+    for idx, sid in enumerate(student_ids, start=1):
+        students_out.append(
+            schemas.ClassStudentOut(
+                student_id=sid,
+                display_name=f"Studente {idx}",
+                nodes=student_nodes.get(sid, []),
+            )
+        )
+
+    return schemas.ClassStudentsResponse(
+        course_id=course_id,
+        students=students_out,
+        total=len(students_out),
     )
 
 
